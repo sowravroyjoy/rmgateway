@@ -1071,7 +1071,7 @@ class _ViewLeadState extends State<ViewLead> {
                                         });
                                       },
                                       child: Text(
-                                        storedocs[i]["firstName"],
+                                        storedocs[i]["firstName"]??"empty",
                                         style: TextStyle(
                                             fontSize: 15.0,
                                             color: Colors.cyan.shade900),
@@ -1087,7 +1087,7 @@ class _ViewLeadState extends State<ViewLead> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      storedocs[i]["ieltsResult"],
+                                      storedocs[i]["ieltsResult"]??"empty",
                                       style: TextStyle(
                                         fontSize: 15.0,
                                       ),
@@ -1102,7 +1102,7 @@ class _ViewLeadState extends State<ViewLead> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      storedocs[i]["applyCountry"],
+                                      storedocs[i]["applyCountry"]??"empty",
                                       style: TextStyle(
                                         fontSize: 15.0,
                                       ),
@@ -1117,7 +1117,7 @@ class _ViewLeadState extends State<ViewLead> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      storedocs[i]["phone"],
+                                      storedocs[i]["phone"]??"empty",
                                       style: TextStyle(
                                         fontSize: 15.0,
                                       ),
@@ -1217,6 +1217,10 @@ class _ViewLeadState extends State<ViewLead> {
                                                                           setState(
                                                                               () {
                                                                             doc.reference.delete();
+                                                                            setState(() {
+                                                                              search = false;
+                                                                              storedocs.clear();
+                                                                            });
                                                                             Navigator.pop(context);
                                                                           });
                                                                         }
@@ -1598,7 +1602,7 @@ class _ViewLeadState extends State<ViewLead> {
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => TodayTask()));
+                                builder: (context) => TodayTask(currentUserName: currentUserName.toString(),)));
                       },
                       child: Text(
                         "Today's Task",

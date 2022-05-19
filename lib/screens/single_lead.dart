@@ -510,7 +510,7 @@ class _SingleLeadState extends State<SingleLead> {
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => TodayTask()));
+                                builder: (context) => TodayTask(currentUserName: currentUserName.toString(),)));
                       },
                       child: Text(
                         "Today's Task",
@@ -1175,7 +1175,8 @@ class _SingleLeadState extends State<SingleLead> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
                                 _singleField("Task Due Date",
-                                    widget.leadModel["taskDueDate"])
+                                    widget.leadModel["taskDueDate"]),
+                                _singleField("Task Status",   widget.leadModel["taskStatus"])
                               ],
                             ),
                           ],

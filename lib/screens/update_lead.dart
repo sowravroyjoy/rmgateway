@@ -436,10 +436,21 @@ class _UpdateLeadState extends State<UpdateLead> {
 
 
   //  datetime
-    _visaIssued = DateFormat("yyyy-MM-dd").parse(widget.leadModel["visaIssued"]);
-    _visaExpired = DateFormat("yyyy-MM-dd").parse(widget.leadModel["visaExpired"]);
-    _ieltsDate = DateFormat("yyyy-MM-dd").parse(widget.leadModel["ieltsDate"]);
-    _taskDueDate = DateFormat("yyyy-MM-dd").parse(widget.leadModel["taskDueDate"]);
+    if(widget.leadModel["visaIssued"] != "0"){
+      _visaIssued = DateFormat("yyyy-MM-dd").parse(widget.leadModel["visaIssued"]);
+    }
+    if(widget.leadModel["visaExpired"] != "0"){
+      _visaExpired = DateFormat("yyyy-MM-dd").parse(widget.leadModel["visaExpired"]);
+    }
+    if(widget.leadModel["ieltsDate"]!= "0"){
+      _ieltsDate = DateFormat("yyyy-MM-dd").parse(widget.leadModel["ieltsDate"]);
+    }
+   if(widget.leadModel["taskDueDate"] != "0"){
+     _taskDueDate = DateFormat("yyyy-MM-dd").parse(widget.leadModel["taskDueDate"]);
+   }
+
+
+
 
 
   //  files
@@ -2850,7 +2861,8 @@ class _UpdateLeadState extends State<UpdateLead> {
                   TextButton(
                       onPressed: (){
                         Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => TodayTask()));
+                            context, MaterialPageRoute(builder: (context) => TodayTask(currentUserName: currentUserName.toString()
+                          ,)));
                       },
                       child: Text(
                         "Today's Task",
@@ -3551,6 +3563,14 @@ class _UpdateLeadState extends State<UpdateLead> {
   Future<bool> uploadDocuments(String id, DocumentReference<Map<String, dynamic>> ref)async{
     bool isError = true;
 
+    bool isTaskStatusChanged = false;
+
+    if(taskSubjectEditingController.text.toString().toLowerCase() != widget.leadModel["taskSubject"].toString().toLowerCase()){
+      isTaskStatusChanged = true;
+    }else{
+      isTaskStatusChanged = false;
+    }
+
     LeadModel leadModel = LeadModel();
     leadModel.timeStamp = FieldValue.serverTimestamp();
     leadModel.userID = currentUserID;
@@ -3562,8 +3582,8 @@ class _UpdateLeadState extends State<UpdateLead> {
     leadModel.applyCountry = _chosenApplyCountry;
     leadModel.originCountry = originCountryEditingController.text;
     leadModel.optionalPhone = optionalPhoneEditingController.text;
-    leadModel.visaIssued =DateFormat('yyyy-MM-dd').format(_visaIssued!);
-    leadModel.visaExpired = DateFormat('yyyy-MM-dd').format(_visaExpired!);
+   leadModel.visaIssued = (_visaIssued!=null)?DateFormat('yyyy-MM-dd').format(_visaIssued!):"0";
+     leadModel.visaExpired =(_visaExpired!=null)? DateFormat('yyyy-MM-dd').format(_visaExpired!):"0";
     leadModel.immigrationHistory = immigrationHistoryEditingController.text;
     leadModel.comments = commentsEditingController.text;
     leadModel.courseLevel = _chosenCourseLevel;
@@ -3578,7 +3598,7 @@ class _UpdateLeadState extends State<UpdateLead> {
     leadModel.studyGap = studyGapEditingController.text;
     leadModel.ielts = _chosenIelts;
     leadModel.ieltsResult = ieltsResultEditingController.text;
-    leadModel.ieltsDate = DateFormat('yyyy-MM-dd').format(_ieltsDate!);
+   leadModel.ieltsDate = (_ieltsDate!=null)?  DateFormat('yyyy-MM-dd').format(_ieltsDate!):"0";
     leadModel.firstChoice = _chosenFirstChoice;
     leadModel.secondChoice = _chosenSecondChoice;
     leadModel.thirdChoice = _chosenThirdChoice;
@@ -3601,7 +3621,8 @@ class _UpdateLeadState extends State<UpdateLead> {
     leadModel.assigned = _chosenAssigned;
     leadModel.taskSubject = taskSubjectEditingController.text;
     leadModel.taskContact = taskContactEditingController.text;
-    leadModel.taskDueDate = DateFormat('yyyy-MM-dd').format(_taskDueDate!);
+ leadModel.taskDueDate =    (_taskDueDate!=null)?DateFormat('yyyy-MM-dd').format(_taskDueDate!):"0";
+    (isTaskStatusChanged==true)? leadModel.taskStatus = "pending": leadModel.taskStatus = widget.leadModel["taskStatus"];
     leadModel.courseName = courseNameEditingController.text;
     leadModel.tutionFee = tutionFeeEditingController.text;
     leadModel.universityName = _chosenUniversity;

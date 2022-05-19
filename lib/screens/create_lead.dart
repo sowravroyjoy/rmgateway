@@ -2786,7 +2786,7 @@ class _CreateLeadState extends State<CreateLead> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    TodayTask()));
+                                    TodayTask(currentUserName: currentUserName.toString(),)));
                       },
                       child: Text(
                         "Today's Task",
@@ -3516,8 +3516,8 @@ class _CreateLeadState extends State<CreateLead> {
     leadModel.applyCountry = _chosenApplyCountry;
     leadModel.originCountry = originCountryEditingController.text;
     leadModel.optionalPhone = optionalPhoneEditingController.text;
-    leadModel.visaIssued =DateFormat('yyyy-MM-dd').format(_visaIssued!);
-    leadModel.visaExpired = DateFormat('yyyy-MM-dd').format(_visaExpired!);
+    leadModel.visaIssued =(_visaIssued!=null)?DateFormat('yyyy-MM-dd').format(_visaIssued!):"0";
+    leadModel.visaExpired =  (_visaExpired!=null)?DateFormat('yyyy-MM-dd').format(_visaExpired!):"0";
     leadModel.immigrationHistory = immigrationHistoryEditingController.text;
     leadModel.comments = commentsEditingController.text;
     leadModel.courseLevel = _chosenCourseLevel;
@@ -3532,7 +3532,7 @@ class _CreateLeadState extends State<CreateLead> {
     leadModel.studyGap = studyGapEditingController.text;
     leadModel.ielts = _chosenIelts;
     leadModel.ieltsResult = ieltsResultEditingController.text;
-    leadModel.ieltsDate = DateFormat('yyyy-MM-dd').format(_ieltsDate!);
+     leadModel.ieltsDate = (_ieltsDate!=null)?DateFormat('yyyy-MM-dd').format(_ieltsDate!):"0";
     leadModel.firstChoice = _chosenFirstChoice;
     leadModel.secondChoice = _chosenSecondChoice;
     leadModel.thirdChoice = _chosenThirdChoice;
@@ -3555,7 +3555,8 @@ class _CreateLeadState extends State<CreateLead> {
     leadModel.assigned = _chosenAssigned;
     leadModel.taskSubject = taskSubjectEditingController.text;
     leadModel.taskContact = taskContactEditingController.text;
-    leadModel.taskDueDate = DateFormat('yyyy-MM-dd').format(_taskDueDate!);
+    leadModel.taskDueDate = (_taskDueDate!=null)?DateFormat('yyyy-MM-dd').format(_taskDueDate!):"0";
+    leadModel.taskStatus = "pending";
     leadModel.courseName = courseNameEditingController.text;
     leadModel.tutionFee = tutionFeeEditingController.text;
     leadModel.universityName = _chosenUniversity;

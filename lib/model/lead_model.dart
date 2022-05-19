@@ -62,6 +62,7 @@ class LeadModel {
   String? taskSubject;
   String? taskContact;
   String? taskDueDate;
+  String? taskStatus;
   String? courseName;
   String? tutionFee;
   String? universityName;
@@ -134,6 +135,7 @@ class LeadModel {
     this.taskSubject,
     this.taskContact,
     this.taskDueDate,
+    this.taskStatus,
     this.courseName,
     this.tutionFee,
     this.universityName,
@@ -208,6 +210,7 @@ class LeadModel {
       taskSubject: map['taskSubject'],
       taskContact: map["taskContact"],
       taskDueDate: map["taskDueDate"],
+      taskStatus: map["taskStatus"],
       courseName: map['courseName'],
       tutionFee: map['tutionFee'],
       universityName: map["universityName"],
@@ -282,6 +285,7 @@ class LeadModel {
       'taskSubject': taskSubject,
       'taskContact': taskContact,
       "taskDueDate":taskDueDate,
+      "taskStatus":taskStatus,
       "courseName":courseName,
       'tutionFee': tutionFee,
       'universityName': universityName,
