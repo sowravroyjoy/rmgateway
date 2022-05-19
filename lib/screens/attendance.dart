@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rmgateway/model/attendance_model.dart';
 import 'package:rmgateway/screens/update_user.dart';
+import 'package:rmgateway/screens/view_lead.dart';
 
 class Attendance extends StatefulWidget {
   final QueryDocumentSnapshot<Object?> employeeModel;
@@ -26,9 +28,15 @@ class _AttendanceState extends State<Attendance> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
   }
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    FirebaseAuth.instance.signOut();
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -349,6 +357,16 @@ class _AttendanceState extends State<Attendance> {
         centerTitle: true,
         title: Text("Please Ensure Your Attendance", style: TextStyle(color: Colors.black),),
         backgroundColor: Colors.cyan.shade100,
+        leading: IconButton(
+          onPressed: (){
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => ViewLead()));
+          },
+          icon: Icon(
+            Icons.home_rounded,
+            color: Colors.cyan.shade700,
+          ),
+        ),
       ),
       body: Container(
         child: Column(

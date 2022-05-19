@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:rmgateway/screens/view_lead.dart';
 
 class Apply extends StatefulWidget {
   const Apply({Key? key}) : super(key: key);
@@ -351,6 +352,19 @@ class _ApplyState extends State<Apply> {
             }));
 
 
+    final backButton = TextButton(
+        onPressed: (){
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => ViewLead()));
+        },
+        child: Text(
+          "Back",
+          style: TextStyle(
+              color: Colors.blue.shade800
+          ),
+        )
+    );
+
     return Scaffold(
       backgroundColor: Colors.grey.shade700,
       body: AlertDialog(
@@ -383,6 +397,8 @@ class _ApplyState extends State<Apply> {
                     interestedCountryField,
                     SizedBox(height: 30,),
                     createButton,
+                    SizedBox(height: 20,),
+                    backButton,
                     SizedBox(height: 40,),
 
                   ],

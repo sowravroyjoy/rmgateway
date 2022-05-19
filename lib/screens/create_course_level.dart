@@ -1,21 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:rmgateway/model/country_model.dart';
+import 'package:rmgateway/model/course_level_model.dart';
+import 'package:rmgateway/model/course_title_model.dart';
+import 'package:rmgateway/model/student_type_model.dart';
 import 'package:rmgateway/model/university_model.dart';
+import 'package:rmgateway/screens/update_country.dart';
+import 'package:rmgateway/screens/update_course_level.dart';
+import 'package:rmgateway/screens/update_course_title.dart';
+import 'package:rmgateway/screens/update_student_type.dart';
 import 'package:rmgateway/screens/update_university.dart';
 import 'package:rmgateway/screens/view_lead.dart';
 
-class CreateUniversity extends StatefulWidget {
-  const CreateUniversity({Key? key}) : super(key: key);
+class CreateCourseLevel extends StatefulWidget {
+  const CreateCourseLevel({Key? key}) : super(key: key);
 
   @override
-  State<CreateUniversity> createState() => _CreateUniversityState();
+  State<CreateCourseLevel> createState() => _CreateCourseLevelState();
 }
 
-class _CreateUniversityState extends State<CreateUniversity> {
+class _CreateCourseLevelState extends State<CreateCourseLevel> {
   final _formKey = GlobalKey<FormState>();
   final nameEditingController = new TextEditingController();
-  final addressEditingController = new TextEditingController();
 
   bool? _process;
   int? _count;
@@ -53,43 +60,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
                 20,
                 15,
               ),
-              labelText: 'University Name',
-              labelStyle: TextStyle(color: Colors.black),
-              floatingLabelStyle: TextStyle(color: Colors.blue),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.blue),
-              ),
-            )));
-
-    final addressField = Container(
-        width: MediaQuery.of(context).size.width / 3,
-        child: TextFormField(
-            cursorColor: Colors.blue,
-            autofocus: false,
-            controller: addressEditingController,
-            keyboardType: TextInputType.name,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return ("address cannot be empty!!");
-              }
-              return null;
-            },
-            onSaved: (value) {
-              addressEditingController.text = value!;
-            },
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              labelText: 'University Address',
+              labelText: 'New Course Level',
               labelStyle: TextStyle(color: Colors.black),
               floatingLabelStyle: TextStyle(color: Colors.blue),
               border: OutlineInputBorder(
@@ -174,7 +145,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
     );
 
     final CollectionReference _collectionReference =
-    FirebaseFirestore.instance.collection("universities");
+    FirebaseFirestore.instance.collection("courselevels");
 
     Widget _buildListView() {
       return StreamBuilder<QuerySnapshot>(
@@ -225,23 +196,6 @@ class _CreateUniversityState extends State<CreateUniversity> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(
                                         'Name',
-                                        style: TextStyle(
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              TableCell(
-                                child: Container(
-                                  color: Colors.cyan.shade300,
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Address',
                                         style: TextStyle(
                                           fontSize: 20.0,
                                           fontWeight: FontWeight.bold,
@@ -312,25 +266,10 @@ class _CreateUniversityState extends State<CreateUniversity> {
                                     child: Center(
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          storedocs[i]["address"],
-                                          style: TextStyle(
-                                            fontSize: 15.0,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                TableCell(
-                                  child: Container(
-                                    child: Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
                                         child:    IconButton(
                                           onPressed: () {
                                             FirebaseFirestore.instance
-                                                .collection('universities')
+                                                .collection('courselevels')
                                                 .get()
                                                 .then((QuerySnapshot querySnapshot) {
                                               for (var doc in querySnapshot.docs) {
@@ -338,7 +277,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
                                                   Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
-                                                          builder: (context) => UpdateUniversity(universityModel: doc,)));
+                                                          builder: (context) => UpdateCourseLevel(courseLevelModel: doc,)));
                                                 }
                                               }
                                             });
@@ -374,7 +313,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
                                                         icon: new Icon(Icons.delete),
                                                         onPressed: () {
                                                           FirebaseFirestore.instance
-                                                              .collection('universities')
+                                                              .collection('courselevels')
                                                               .get()
                                                               .then((QuerySnapshot querySnapshot) {
                                                             for (var doc in querySnapshot.docs) {
@@ -416,7 +355,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
       backgroundColor: Colors.grey.shade700,
       body: AlertDialog(
         backgroundColor: Colors.cyan.shade100,
-        title: Center(child: Text("Create University")),
+        title: Center(child: Text("Create Course Level")),
         titleTextStyle: TextStyle(fontSize: 20),
         scrollable: true,
         content:SingleChildScrollView(
@@ -430,14 +369,12 @@ class _CreateUniversityState extends State<CreateUniversity> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     nameField,
-                    SizedBox(height: 20,),
-                    addressField,
                     SizedBox(height: 30,),
                     createButton,
                     SizedBox(height: 10,),
                     backButton,
                     SizedBox(height: 40,),
-                     _buildListView()
+                    _buildListView()
 
                   ],
                 ),
@@ -452,28 +389,26 @@ class _CreateUniversityState extends State<CreateUniversity> {
 
   void AddData() async{
     if (_formKey.currentState!.validate()) {
-      final ref = FirebaseFirestore.instance.collection("universities").doc();
+      final ref = FirebaseFirestore.instance.collection("courselevels").doc();
 
-      UniversityModel universityModel = UniversityModel();
-      universityModel.timeStamp = FieldValue.serverTimestamp();
-      universityModel.userID = ref.id;
-      universityModel.name = nameEditingController.text;
-      universityModel.address = addressEditingController.text;
-      universityModel.docID = ref.id;
-      ref.set(universityModel.toMap());
+      CourseLevelModel courseLevelModel = CourseLevelModel();
+      courseLevelModel.timeStamp = FieldValue.serverTimestamp();
+      courseLevelModel.userID = ref.id;
+      courseLevelModel.name = nameEditingController.text;
+      courseLevelModel.docID = ref.id;
+      ref.set(courseLevelModel.toMap());
 
 
       setState(() {
         _process = false;
         _count = 1;
         nameEditingController.clear();
-        addressEditingController.clear();
       });
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.green, content: Text("New university added!!")));
+          backgroundColor: Colors.green, content: Text("New course level added!!")));
 
-   //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => EmployeeDetails()), (route) => false);
+
 
     }
     else{

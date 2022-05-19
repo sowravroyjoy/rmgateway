@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rmgateway/screens/update_user.dart';
+import 'package:rmgateway/screens/view_lead.dart';
 
 class EmployeeDetails extends StatefulWidget {
   const EmployeeDetails({Key? key}) : super(key: key);
@@ -12,6 +13,10 @@ class EmployeeDetails extends StatefulWidget {
 class _EmployeeDetailsState extends State<EmployeeDetails> {
 
   int totalEmployees = 0;
+  final TextEditingController searchController = TextEditingController();
+
+  final List storedocs = [];
+  bool search = false;
 
   @override
   void initState() {
@@ -27,6 +32,8 @@ class _EmployeeDetailsState extends State<EmployeeDetails> {
         }
       }
       setState(() {
+        search = false;
+        storedocs.clear();
 
       });
     });
@@ -35,6 +42,51 @@ class _EmployeeDetailsState extends State<EmployeeDetails> {
 
   @override
   Widget build(BuildContext context) {
+    final nameSearchField = Container(
+        width: MediaQuery.of(context).size.width / 4,
+        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+        decoration: BoxDecoration(
+            color: Colors.pink.shade100,
+            borderRadius: BorderRadius.circular(10)),
+        child: TextFormField(
+            cursorColor: Colors.black,
+            autofocus: false,
+            controller: searchController,
+            keyboardType: TextInputType.name,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return ("name cannot be empty!!");
+              }
+              return null;
+            },
+            onSaved: (value) {
+              searchController.text = value!;
+            },
+            onChanged: (value) {
+              setState(() {
+                search = true;
+              });
+              nameSearch(value);
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.fromLTRB(
+                20,
+                15,
+                20,
+                15,
+              ),
+              labelText: 'Search Employee',
+              labelStyle: TextStyle(color: Colors.black),
+              floatingLabelStyle: TextStyle(color: Colors.black),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.black),
+              ),
+            )));
 
     final CollectionReference _collectionReference =
     FirebaseFirestore.instance.collection("users");
@@ -56,13 +108,13 @@ class _EmployeeDetailsState extends State<EmployeeDetails> {
                 child: Text('Empty'),
               );
             } else {
-
-              final List storedocs = [];
-              snapshot.data!.docs.where((element) => element["userType"].toString().toLowerCase() != "Admin")
+              snapshot.data!.docs.where((element) => element["userType"].toString().toLowerCase() != "admin")
                   .map((DocumentSnapshot document) {
                 Map a = document.data() as Map<String, dynamic>;
-                storedocs.add(a);
-                a['id'] = document.id;
+                if (!search) {
+                  storedocs.add(a);
+                  a['id'] = document.id;
+                }
               }).toList();
 
 
@@ -348,6 +400,16 @@ class _EmployeeDetailsState extends State<EmployeeDetails> {
         centerTitle: true,
         title: Text("Employee Details", style: TextStyle(color: Colors.black),),
         backgroundColor: Colors.cyan.shade100,
+        leading: IconButton(
+          onPressed: (){
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => ViewLead()));
+          },
+          icon: Icon(
+            Icons.home_rounded,
+            color: Colors.cyan.shade700,
+          ),
+        ),
       ),
       body: Container(
         child: Column(
@@ -369,17 +431,10 @@ class _EmployeeDetailsState extends State<EmployeeDetails> {
                   ),
                 ),
 
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-                  decoration: BoxDecoration(
-                      color: Colors.pink.shade100,
-                      borderRadius: BorderRadius.circular(10)
-                  ),
-                  child: Text(
-                      "Total Employees  :  $totalEmployees"
-                  ),
-                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: nameSearchField,
+                )
               ],
             ),
             SizedBox(height: 10,),
@@ -388,5 +443,28 @@ class _EmployeeDetailsState extends State<EmployeeDetails> {
         ),
       ),
     );
+  }
+
+
+
+  void nameSearch(String value) async {
+    final documents = await FirebaseFirestore.instance
+        .collection('users')
+        .orderBy("timeStamp", descending: true)
+        .get();
+    if (searchController.text != "") {
+      storedocs.clear();
+      for (var doc in documents.docs) {
+        if (doc["name"].toString().toLowerCase().contains(value.toLowerCase()) && doc["userType"] != "Admin") {
+          storedocs.add(doc);
+          setState(() {});
+        }
+      }
+    } else {
+      setState(() {
+        storedocs.clear();
+        search = false;
+      });
+    }
   }
 }

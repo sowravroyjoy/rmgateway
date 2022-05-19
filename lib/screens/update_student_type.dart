@@ -1,22 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:rmgateway/model/student_type_model.dart';
 import 'package:rmgateway/model/university_model.dart';
+import 'package:rmgateway/screens/create_student_type.dart';
 import 'package:rmgateway/screens/create_university.dart';
 
-class UpdateUniversity extends StatefulWidget {
-  final QueryDocumentSnapshot<Object?> universityModel;
-  const UpdateUniversity({Key? key, required this.universityModel}) : super(key: key, );
+class UpdateStudentType extends StatefulWidget {
+  final QueryDocumentSnapshot<Object?> studentModel;
+  const UpdateStudentType({Key? key, required this.studentModel}) : super(key: key, );
 
   @override
-  State<UpdateUniversity> createState() => _UpdateUniversityState();
+  State<UpdateStudentType> createState() => _UpdateStudentTypeState();
 }
 
-class _UpdateUniversityState extends State<UpdateUniversity> {
+class _UpdateStudentTypeState extends State<UpdateStudentType> {
 
   final _formKey = GlobalKey<FormState>();
   var nameEditingController ;
-  var addressEditingController ;
+
 
   bool? _process;
   int? _count;
@@ -28,8 +30,8 @@ class _UpdateUniversityState extends State<UpdateUniversity> {
     _process = false;
     _count = 1;
 
-    nameEditingController = TextEditingController(text: widget.universityModel["name"]);
-    addressEditingController = TextEditingController(text: widget.universityModel["address"]);
+    nameEditingController = TextEditingController(text: widget.studentModel["name"]);
+
 
   }
   @override
@@ -58,7 +60,7 @@ class _UpdateUniversityState extends State<UpdateUniversity> {
                 20,
                 15,
               ),
-              labelText: 'University Name',
+              labelText: 'Student Type',
               labelStyle: TextStyle(color: Colors.black),
               floatingLabelStyle: TextStyle(color: Colors.blue),
               border: OutlineInputBorder(
@@ -70,41 +72,7 @@ class _UpdateUniversityState extends State<UpdateUniversity> {
               ),
             )));
 
-    final addressField = Container(
-        width: MediaQuery.of(context).size.width / 3,
-        child: TextFormField(
-            cursorColor: Colors.blue,
-            autofocus: false,
-            controller: addressEditingController,
-            keyboardType: TextInputType.name,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return ("address cannot be empty!!");
-              }
-              return null;
-            },
-            onSaved: (value) {
-              addressEditingController.text = value!;
-            },
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              labelText: 'University Address',
-              labelStyle: TextStyle(color: Colors.black),
-              floatingLabelStyle: TextStyle(color: Colors.blue),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.blue),
-              ),
-            )));
+
 
 
     final updateButton =  Material(
@@ -182,7 +150,7 @@ class _UpdateUniversityState extends State<UpdateUniversity> {
       backgroundColor: Colors.grey.shade700,
       body: AlertDialog(
         backgroundColor: Colors.cyan.shade100,
-        title: Center(child: Text("Edit University")),
+        title: Center(child: Text("Edit Student Type")),
         titleTextStyle: TextStyle(fontSize: 20),
         scrollable: true,
         content:SingleChildScrollView(
@@ -196,8 +164,6 @@ class _UpdateUniversityState extends State<UpdateUniversity> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     nameField,
-                    SizedBox(height: 20,),
-                    addressField,
                     SizedBox(height: 30,),
                     updateButton,
                     SizedBox(height: 10,),
@@ -217,26 +183,25 @@ class _UpdateUniversityState extends State<UpdateUniversity> {
 
   void AddData() async{
     if (_formKey.currentState!.validate()) {
-      final ref = FirebaseFirestore.instance.collection("universities").doc(
-          widget.universityModel["docID"]);
+      final ref = FirebaseFirestore.instance.collection("studenttypes").doc(
+          widget.studentModel["docID"]);
 
-      UniversityModel universityModel = UniversityModel();
-      universityModel.timeStamp = FieldValue.serverTimestamp();
-      universityModel.userID = ref.id;
-      universityModel.name = nameEditingController.text;
-      universityModel.address = addressEditingController.text;
-      universityModel.docID = ref.id;
-      ref.set(universityModel.toMap());
+      StudentTypeModel studentTypeModel = StudentTypeModel();
+      studentTypeModel.timeStamp = FieldValue.serverTimestamp();
+      studentTypeModel.userID = ref.id;
+      studentTypeModel.name = nameEditingController.text;
+      studentTypeModel.docID = ref.id;
+      ref.set(studentTypeModel.toMap());
 
       setState(() {
         _process = false;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.green, content: Text("University updated!!")));
+          backgroundColor: Colors.green, content: Text("Student Type updated!!")));
 
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => CreateUniversity()));
+          context, MaterialPageRoute(builder: (context) => CreateStudentType()));
 
     }
     else{

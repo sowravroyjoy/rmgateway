@@ -26,7 +26,7 @@ class _SignUpState extends State<SignUp> {
   final emailEditingController = new TextEditingController();
   final passwordEditingController = new TextEditingController();
 
-  final _userTypes = ['Admin', 'Employee', 'Manager'];
+  final _userTypes = [ 'Employee', 'Manager'];
   String? _chosenUser;
   bool? _process;
   int? _count;
@@ -398,7 +398,7 @@ class _SignUpState extends State<SignUp> {
     if(_formKey.currentState!.validate() && _chosenUser != null && fileName != null){
           await _auth.createUserWithEmailAndPassword(email: emailEditingController.text, password: passwordEditingController.text)
               .then((value) => {
-                postDetailsToFirestore()
+               postDetailsToFirestore()
           }).catchError((e)
           {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -419,11 +419,13 @@ class _SignUpState extends State<SignUp> {
   }
 
   void postDetailsToFirestore() async{
+    await _auth.currentUser?.sendEmailVerification();
    final ref =   FirebaseFirestore.instance.collection("users").doc();
+   final userid = FirebaseAuth.instance.currentUser?.uid;
 
    UserModel userModel = UserModel();
    userModel.timeStamp = FieldValue.serverTimestamp();
-   userModel.userID = ref.id;
+   userModel.userID = userid;
    userModel.name = nameEditingController.text;
    userModel.contact = contactEditingController.text;
    userModel.email = emailEditingController.text;

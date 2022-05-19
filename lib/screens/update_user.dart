@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rmgateway/screens/employee_details.dart';
+import 'package:rmgateway/screens/user_profile.dart';
 
 import '../model/user_model.dart';
 
@@ -18,9 +19,8 @@ class _UpdateUserState extends State<UpdateUser> {
   final _formKey = GlobalKey<FormState>();
   var nameEditingController ;
   var contactEditingController ;
-  var emailEditingController;
 
-  final _userTypes = ['Admin', 'Employee', 'Manager'];
+  final _userTypes = [ 'Employee', 'Manager'];
   String? _chosenUser;
   bool? _process;
   int? _count;
@@ -34,7 +34,6 @@ class _UpdateUserState extends State<UpdateUser> {
 
     nameEditingController = TextEditingController(text: widget.userModel["name"]);
     contactEditingController = TextEditingController(text: widget.userModel["contact"]);
-    emailEditingController = TextEditingController(text: widget.userModel["email"]);
     _chosenUser = widget.userModel["userType"];
 
   }
@@ -111,41 +110,7 @@ class _UpdateUserState extends State<UpdateUser> {
                 borderSide: BorderSide(color: Colors.blue),
               ),
             )));
-    final emailField = Container(
-        width: MediaQuery.of(context).size.width / 3,
-        child: TextFormField(
-            cursorColor: Colors.cyan.shade100,
-            autofocus: false,
-            controller: emailEditingController,
-            keyboardType: TextInputType.name,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return ("Email cannot be empty!!");
-              }
-              return null;
-            },
-            onSaved: (value) {
-              emailEditingController.text = value!;
-            },
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              labelText: 'Email',
-              labelStyle: TextStyle(color: Colors.black),
-              floatingLabelStyle: TextStyle(color: Colors.blue),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.blue),
-              ),
-            )));
+
 
 
 
@@ -278,8 +243,6 @@ class _UpdateUserState extends State<UpdateUser> {
                     SizedBox(height: 20,),
                     contactField,
                     SizedBox(height: 20,),
-                    emailField,
-                    SizedBox(height: 20,),
                   userDropdown  ,
                     SizedBox(height: 20,),
                     createButton,
@@ -308,7 +271,7 @@ class _UpdateUserState extends State<UpdateUser> {
       userModel.userID = ref.id;
       userModel.name = nameEditingController.text;
       userModel.contact = contactEditingController.text;
-      userModel.email = emailEditingController.text;
+      userModel.email = widget.userModel["email"];
       userModel.userType = _chosenUser;
       userModel.imageUrl = widget.userModel["imageUrl"];
       userModel.docID = ref.id;
@@ -321,8 +284,17 @@ class _UpdateUserState extends State<UpdateUser> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Colors.green, content: Text("User updated!!")));
 
-      Navigator.pushAndRemoveUntil(
-          context, MaterialPageRoute(builder: (context) => EmployeeDetails()), (route) => false);
+      FirebaseFirestore.instance
+          .collection('users')
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          if (doc["docID"] == widget.userModel["docID"]) {
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => UserProfile(userModel: doc)));
+          }
+        }
+      });
 
     }
     else{

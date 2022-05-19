@@ -1,22 +1,33 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_sms/flutter_sms.dart';
+import 'package:rmgateway/model/country_model.dart';
+import 'package:rmgateway/model/student_type_model.dart';
 import 'package:rmgateway/model/university_model.dart';
+import 'package:rmgateway/screens/update_country.dart';
+import 'package:rmgateway/screens/update_student_type.dart';
 import 'package:rmgateway/screens/update_university.dart';
 import 'package:rmgateway/screens/view_lead.dart';
+import 'package:twilio_flutter/twilio_flutter.dart';
+import 'package:http/http.dart' as http;
 
-class CreateUniversity extends StatefulWidget {
-  const CreateUniversity({Key? key}) : super(key: key);
+class SendEmail extends StatefulWidget {
+  final String? singleEmail;
+  const SendEmail({Key? key, this.singleEmail}) : super(key: key);
 
   @override
-  State<CreateUniversity> createState() => _CreateUniversityState();
+  State<SendEmail> createState() => _SendEmailState();
 }
 
-class _CreateUniversityState extends State<CreateUniversity> {
+class _SendEmailState extends State<SendEmail> {
   final _formKey = GlobalKey<FormState>();
-  final nameEditingController = new TextEditingController();
-  final addressEditingController = new TextEditingController();
-
+  final emailEditingController = new TextEditingController();
+  final subjectEditingController = new TextEditingController();
+  List<String> emailList = [];
   bool? _process;
   int? _count;
 
@@ -26,24 +37,29 @@ class _CreateUniversityState extends State<CreateUniversity> {
     super.initState();
     _process = false;
     _count = 1;
+
+    if(widget.singleEmail != null){
+      emailList.add(widget.singleEmail.toString());
+    }
   }
   @override
   Widget build(BuildContext context) {
-    final nameField = Container(
+    final emailField = Container(
         width: MediaQuery.of(context).size.width / 3,
         child: TextFormField(
             cursorColor: Colors.blue,
             autofocus: false,
-            controller: nameEditingController,
+            controller: emailEditingController,
             keyboardType: TextInputType.name,
+            maxLines: 10,
             validator: (value) {
               if (value!.isEmpty) {
-                return ("name cannot be empty!!");
+                return ("email cannot be empty!!");
               }
               return null;
             },
             onSaved: (value) {
-              nameEditingController.text = value!;
+              emailEditingController.text = value!;
             },
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
@@ -53,7 +69,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
                 20,
                 15,
               ),
-              labelText: 'University Name',
+              labelText: 'Write your email',
               labelStyle: TextStyle(color: Colors.black),
               floatingLabelStyle: TextStyle(color: Colors.blue),
               border: OutlineInputBorder(
@@ -65,21 +81,21 @@ class _CreateUniversityState extends State<CreateUniversity> {
               ),
             )));
 
-    final addressField = Container(
+    final subjectField = Container(
         width: MediaQuery.of(context).size.width / 3,
         child: TextFormField(
             cursorColor: Colors.blue,
             autofocus: false,
-            controller: addressEditingController,
+            controller: subjectEditingController,
             keyboardType: TextInputType.name,
             validator: (value) {
               if (value!.isEmpty) {
-                return ("address cannot be empty!!");
+                return ("subject cannot be empty!!");
               }
               return null;
             },
             onSaved: (value) {
-              addressEditingController.text = value!;
+              subjectEditingController.text = value!;
             },
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
@@ -89,7 +105,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
                 20,
                 15,
               ),
-              labelText: 'University Address',
+              labelText: 'Write your subject',
               labelStyle: TextStyle(color: Colors.black),
               floatingLabelStyle: TextStyle(color: Colors.blue),
               border: OutlineInputBorder(
@@ -122,7 +138,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
           (_count! < 0)
               ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               backgroundColor: Colors.red, content: Text("Wait Please!!")))
-              : AddData();
+              : _sendEmail();
         },
         child: (_process!)
             ? Row(
@@ -150,7 +166,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
           ],
         )
             : Text(
-          '  Create  ',
+          '  Send  ',
           textAlign: TextAlign.center,
           style:
           TextStyle(color: Colors.black),
@@ -174,7 +190,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
     );
 
     final CollectionReference _collectionReference =
-    FirebaseFirestore.instance.collection("universities");
+    FirebaseFirestore.instance.collection("leads");
 
     Widget _buildListView() {
       return StreamBuilder<QuerySnapshot>(
@@ -193,16 +209,15 @@ class _CreateUniversityState extends State<CreateUniversity> {
                 child: Text('Empty'),
               );
             } else {
-
               final List storedocs = [];
               snapshot.data!.docs
                   .map((DocumentSnapshot document) {
                 Map a = document.data() as Map<String, dynamic>;
-                storedocs.add(a);
-                a['id'] = document.id;
+                if(widget.singleEmail == null){
+                  storedocs.add(a);
+                  a['id'] = document.id;
+                }
               }).toList();
-
-
               return  Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
                 decoration: BoxDecoration(
@@ -217,6 +232,23 @@ class _CreateUniversityState extends State<CreateUniversity> {
                       children: [
                         TableRow(
                             children: [
+                              TableCell(
+                                child: Container(
+                                  color: Colors.cyan.shade300,
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'Select',
+                                        style: TextStyle(
+                                          fontSize: 20.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
                               TableCell(
                                 child: Container(
                                   color: Colors.cyan.shade300,
@@ -241,41 +273,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(
-                                        'Address',
-                                        style: TextStyle(
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              TableCell(
-                                child: Container(
-                                  color: Colors.cyan.shade300,
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Edit',
-                                        style: TextStyle(
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              TableCell(
-                                child: Container(
-                                  color: Colors.cyan.shade300,
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Delete',
+                                        'email',
                                         style: TextStyle(
                                           fontSize: 20.0,
                                           fontWeight: FontWeight.bold,
@@ -287,8 +285,6 @@ class _CreateUniversityState extends State<CreateUniversity> {
                               ),
                             ]
                         ),
-
-
                         for(var i = 0 ; i< storedocs.length; i++)...[
                           TableRow(
                               children: [
@@ -297,55 +293,36 @@ class _CreateUniversityState extends State<CreateUniversity> {
                                     child: Center(
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          storedocs[i]["name"],
-                                          style: TextStyle(
-                                            fontSize: 15.0,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                TableCell(
-                                  child: Container(
-                                    child: Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          storedocs[i]["address"],
-                                          style: TextStyle(
-                                            fontSize: 15.0,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                TableCell(
-                                  child: Container(
-                                    child: Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child:    IconButton(
-                                          onPressed: () {
-                                            FirebaseFirestore.instance
-                                                .collection('universities')
-                                                .get()
-                                                .then((QuerySnapshot querySnapshot) {
-                                              for (var doc in querySnapshot.docs) {
-                                                if(doc["docID"] == storedocs[i]["docID"]){
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) => UpdateUniversity(universityModel: doc,)));
+                                        child: Checkbox(
+                                          onChanged: (bool? value) {
+                                            setState(() {
+
+                                              if(storedocs[i]["email"] != null){
+                                                if(value==true){
+                                                  emailList.add(storedocs[i]["email"]);
+                                                  print(emailList);
+                                                }else{
+                                                  emailList.remove(storedocs[i]["email"]);
+                                                  print(emailList);
                                                 }
                                               }
                                             });
                                           },
-                                          icon: Icon(
-                                            Icons.edit,
-                                            color: Colors.black,
+                                          value: (emailList.contains(storedocs[i]["email"]))? true : false,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                TableCell(
+                                  child: Container(
+                                    child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          storedocs[i]["firstName"],
+                                          style: TextStyle(
+                                            fontSize: 15.0,
                                           ),
                                         ),
                                       ),
@@ -357,49 +334,17 @@ class _CreateUniversityState extends State<CreateUniversity> {
                                     child: Center(
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
-                                        child:    IconButton(
-                                          onPressed: () {
-                                            showDialog(
-                                                context: context,
-                                                builder: (BuildContext context)=>AlertDialog(
-                                                  title: Text("Confirm"),
-                                                  content: Text("Do you want to delete it?"),
-                                                  actions: [
-                                                    IconButton(
-                                                        icon: new Icon(Icons.close),
-                                                        onPressed: () {
-                                                          Navigator.pop(context);
-                                                        }),
-                                                    IconButton(
-                                                        icon: new Icon(Icons.delete),
-                                                        onPressed: () {
-                                                          FirebaseFirestore.instance
-                                                              .collection('universities')
-                                                              .get()
-                                                              .then((QuerySnapshot querySnapshot) {
-                                                            for (var doc in querySnapshot.docs) {
-                                                              if(doc["docID"] == storedocs[i]["docID"]){
-                                                                setState(() {
-                                                                  doc.reference.delete();
-                                                                  Navigator.pop(context);
-                                                                });
-                                                              }
-                                                            }
-                                                          });
-                                                        })
-                                                  ],
-                                                )
-                                            );
-                                          },
-                                          icon: Icon(
-                                            Icons.delete,
-                                            color: Colors.black,
+                                        child: Text(
+                                          storedocs[i]["email"],
+                                          style: TextStyle(
+                                            fontSize: 15.0,
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
+
                               ]
                           )
                         ]
@@ -416,7 +361,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
       backgroundColor: Colors.grey.shade700,
       body: AlertDialog(
         backgroundColor: Colors.cyan.shade100,
-        title: Center(child: Text("Create University")),
+        title: Center(child: Text("Send Email")),
         titleTextStyle: TextStyle(fontSize: 20),
         scrollable: true,
         content:SingleChildScrollView(
@@ -429,15 +374,15 @@ class _CreateUniversityState extends State<CreateUniversity> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    nameField,
-                    SizedBox(height: 20,),
-                    addressField,
+                    subjectField,
+                    SizedBox(height: 10,),
+                    emailField,
                     SizedBox(height: 30,),
                     createButton,
                     SizedBox(height: 10,),
                     backButton,
                     SizedBox(height: 40,),
-                     _buildListView()
+                    _buildListView()
 
                   ],
                 ),
@@ -450,39 +395,53 @@ class _CreateUniversityState extends State<CreateUniversity> {
   }
 
 
-  void AddData() async{
-    if (_formKey.currentState!.validate()) {
-      final ref = FirebaseFirestore.instance.collection("universities").doc();
-
-      UniversityModel universityModel = UniversityModel();
-      universityModel.timeStamp = FieldValue.serverTimestamp();
-      universityModel.userID = ref.id;
-      universityModel.name = nameEditingController.text;
-      universityModel.address = addressEditingController.text;
-      universityModel.docID = ref.id;
-      ref.set(universityModel.toMap());
 
 
-      setState(() {
-        _process = false;
-        _count = 1;
-        nameEditingController.clear();
-        addressEditingController.clear();
-      });
-
+  void _sendEmail() async {
+    if(subjectEditingController.text.isEmpty && emailEditingController.text.isEmpty){
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.green, content: Text("New university added!!")));
-
-   //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => EmployeeDetails()), (route) => false);
-
-    }
-    else{
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.red, content: Text("Something is wrong!!")));
+          backgroundColor: Colors.red, content: Text("At Least 1 Person or Message Required")));
       setState(() {
         _process = false;
         _count = 1;
       });
+    }else{
+      try{
+        var response;
+        for(String email in emailList){
+           response = await http.post(
+              Uri.parse("https://api.emailjs.com/api/v1.0/email/send"),
+              headers: {'Content-Type': 'application/json'},
+              body: json.encode({
+                "service_id": "service_ylnt5nj",
+                "template_id": "template_q6vazne",
+                "user_id":"43hhc_4vd52NrjxFU",
+                "template_params": {
+                  "subject" : subjectEditingController.text,
+                  "name" : "Sumit",
+                  "message" : emailEditingController.text,
+                  "user_email" : email
+                }
+              }));
+        }
+        print(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.green, content: Text("Email sent")));
+        setState(() {
+          _process = false;
+          _count = 1;
+          subjectEditingController.clear();
+          emailEditingController.clear();
+        });
+      }catch(e){
+        print(e);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.red, content: Text("Something is wrong!!")));
+        setState(() {
+          _process = false;
+          _count = 1;
+        });
+      }
     }
   }
 }

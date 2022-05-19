@@ -3,8 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rmgateway/model/attendance_model.dart';
+import 'package:rmgateway/screens/admin_attendance.dart';
 import 'package:rmgateway/screens/attendance.dart';
 import 'package:rmgateway/screens/signup.dart';
+import 'package:rmgateway/screens/view_lead.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
@@ -17,10 +20,13 @@ class _SignInState extends State<SignIn> {
   final _formKey = GlobalKey<FormState>();
   final emailEditingController = new TextEditingController();
   final passwordEditingController = new TextEditingController();
+  final _formKeySecond = GlobalKey<FormState>();
+  final nameEditingController = new TextEditingController();
 
   bool? _process;
   int? _count;
 
+  bool _selection = false;
   final _auth = FirebaseAuth.instance;
 
   @override
@@ -30,6 +36,8 @@ class _SignInState extends State<SignIn> {
     _process = false;
     _count = 1;
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +137,7 @@ class _SignInState extends State<SignIn> {
           (_count! < 0)
               ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   backgroundColor: Colors.red, content: Text("Wait Please!!")))
-              : AddData();
+              : Log();
         },
         child: (_process!)
             ? Row(
@@ -164,8 +172,97 @@ class _SignInState extends State<SignIn> {
       ),
     );
 
+    final _rememberField = Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Checkbox(
+            value: _selection,
+            onChanged: (bool? value){
+              setState(() {
+                _selection = value!;
+              });
+            }
+        ),
+        SizedBox(width: 10,),
+        Text(
+          "Remember me",
+        )
+      ],
+    );
+
+    final nameField = Container(
+        width: MediaQuery.of(context).size.width / 3,
+        child: TextFormField(
+            cursorColor: Colors.blue,
+            autofocus: false,
+            controller: nameEditingController,
+            keyboardType: TextInputType.name,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return ("email cannot be empty!!");
+              }
+              return null;
+            },
+            onSaved: (value) {
+              nameEditingController.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.fromLTRB(
+                20,
+                15,
+                20,
+                15,
+              ),
+              labelText: 'Email',
+              labelStyle: TextStyle(color: Colors.black),
+              floatingLabelStyle: TextStyle(color: Colors.blue),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+            )));
+
     final forgetButton = TextButton(
-        onPressed: () {},
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder:
+                  (BuildContext context) =>
+                  AlertDialog(
+                    title: Text("Forget Password"),
+                    content: Form(
+                      key: _formKeySecond,
+                        child: nameField
+                    ),
+                    actions: [
+                      IconButton(
+                          icon: new Icon(
+                              Icons.close),
+                          onPressed: () {
+                            Navigator.pop(
+                                context);
+                          }),
+                      IconButton(
+                          icon: new Icon(
+                              Icons.delete),
+                          onPressed: () async {
+                            if(_formKeySecond.currentState!.validate()){
+                              await FirebaseAuth.instance
+                                  .sendPasswordResetEmail(email: nameEditingController.text).whenComplete((){
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    backgroundColor: Colors.green, content: Text("Password recovery email sent!")));
+                                Navigator.of(context).pop();
+                              });
+                            }
+                          })
+                    ],
+                  ));
+        },
         child: Text(
           "Forget password",
           style: TextStyle(color: Colors.red.shade800),
@@ -217,6 +314,10 @@ class _SignInState extends State<SignIn> {
                     SizedBox(
                       height: 10,
                     ),
+                    _rememberField,
+                    SizedBox(
+                      height: 10,
+                    ),
                     forgetButton,
                     Padding(
                       padding: const EdgeInsets.fromLTRB(50, 0, 0, 0),
@@ -235,33 +336,13 @@ class _SignInState extends State<SignIn> {
     );
   }
 
-  void AddData() async {
+  void Log() async {
     if (_formKey.currentState!.validate()) {
       await _auth
           .signInWithEmailAndPassword(
               email: emailEditingController.text,
               password: passwordEditingController.text)
-          .then((uid) => {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    backgroundColor: Colors.green,
-                    content: Text("Login Successful!!"))),
-                FirebaseFirestore.instance
-                    .collection('users')
-                    .get()
-                    .then((QuerySnapshot querySnapshot) {
-                  for (var doc in querySnapshot.docs) {
-                    if (doc["email"].toString().toLowerCase() ==
-                        emailEditingController.text.toLowerCase()) {
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  Attendance(employeeModel: doc)),
-                          (route) => false);
-                    }
-                  }
-                })
-              })
+          .then((uid) => {AddData()})
           .catchError((e) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             backgroundColor: Colors.red, content: Text("Login failed!!")));
@@ -276,6 +357,53 @@ class _SignInState extends State<SignIn> {
       setState(() {
         _process = false;
         _count = 1;
+      });
+    }
+  }
+
+  void AddData() async {
+    var pref = await SharedPreferences.getInstance();
+    var _currentUser = FirebaseAuth.instance.currentUser;
+    if(_selection){
+      pref.setString("email", emailEditingController.text);
+      pref.setString("password", passwordEditingController.text);
+    }else{
+      pref.remove("email");
+      pref.remove("password");
+    }
+    if (_currentUser?.emailVerified == true) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green, content: Text("Login Successful!!")));
+      FirebaseFirestore.instance
+          .collection('users')
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          if (doc["email"].toString().toLowerCase() ==
+                  emailEditingController.text.toLowerCase() &&
+              doc["userType"].toString().toLowerCase() == "admin") {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => ViewLead()),
+                (route) => false);
+          } else if (doc["email"].toString().toLowerCase() ==
+              emailEditingController.text.toLowerCase()) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ViewLead()),
+                (route) => false);
+          }
+        }
+      });
+    } else{
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red, content: Text("Please verify your email!!")));
+      setState(() {
+        _process = false;
+        _count = 1;
+        emailEditingController.clear();
+        passwordEditingController.clear();
       });
     }
   }

@@ -1,15 +1,29 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:rmgateway/screens/admin_attendance.dart';
 import 'package:rmgateway/screens/apply.dart';
 import 'package:rmgateway/screens/attendance.dart';
+import 'package:rmgateway/screens/create_country.dart';
+import 'package:rmgateway/screens/create_course_level.dart';
+import 'package:rmgateway/screens/create_course_title.dart';
+import 'package:rmgateway/screens/create_lead.dart';
+import 'package:rmgateway/screens/create_lead_source.dart';
+import 'package:rmgateway/screens/create_status.dart';
+import 'package:rmgateway/screens/create_student_type.dart';
 import 'package:rmgateway/screens/create_university.dart';
+import 'package:rmgateway/screens/create_weightage.dart';
 import 'package:rmgateway/screens/employee_details.dart';
+import 'package:rmgateway/screens/send_email.dart';
+import 'package:rmgateway/screens/send_sms.dart';
 import 'package:rmgateway/screens/signin.dart';
 import 'package:rmgateway/screens/signup.dart';
+import 'package:rmgateway/screens/today_task.dart';
 import 'package:rmgateway/screens/update_university.dart';
 import 'package:rmgateway/screens/update_user.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:rmgateway/screens/view_lead.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +38,9 @@ void main() async{
         measurementId: "G-6LWLJGK1TS"
     ),
   );
-  runApp(const MyApp());
+  SharedPreferences _pref = await SharedPreferences.getInstance();
+  var _email = _pref.getString('email');
+  runApp( MyApp(email: _email));
 }
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
@@ -38,13 +54,14 @@ class MyCustomScrollBehavior extends MaterialScrollBehavior {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final String? email;
+  const MyApp({Key? key, required this.email}) : super(key: key);
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'RM Gateway',
       scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -59,7 +76,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const SignIn(),
+      home:  email == null? SignIn() :ViewLead(),
     );
   }
 }
