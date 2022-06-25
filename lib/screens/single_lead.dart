@@ -67,7 +67,6 @@ class _SingleLeadState extends State<SingleLead> {
     "Add Country",
     "Add University",
     "Add Course Level",
-    "Add Course Title",
     "Add Lead Source",
     "Add Status",
     "Add Student Type",
@@ -473,7 +472,7 @@ class _SingleLeadState extends State<SingleLead> {
                         height: 80,
                         child: CircleAvatar(
                           backgroundImage: AssetImage(
-                            "assets/images/demo.jpg",
+                            "assets/images/demo.jpeg",
                           ),
                         )),
                   ),
@@ -641,645 +640,669 @@ class _SingleLeadState extends State<SingleLead> {
             ),
           ),
           Expanded(
+            child: Stack(
+              children: [
+            Center(
             child: Container(
-              width: widthMain,
-              height: MediaQuery.of(context).size.height,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 20, 0, 0),
-                      child: Text(
-                        widget.leadModel["firstName"],
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.cyan.shade700),
+            width: MediaQuery.of(context).size.width/2,
+            height: MediaQuery.of(context).size.height/2,
+            decoration: BoxDecoration(
+              image: DecorationImage(image: AssetImage("assets/images/demo.jpeg"), fit: BoxFit.cover,opacity: 0.09),
+            ),
+          ),
+    ),
+                Container(
+                width: widthMain,
+                height: MediaQuery.of(context).size.height,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      SizedBox(
+                        height: 20,
                       ),
-                    ),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Personal Details",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("First Name",
-                                    widget.leadModel["firstName"]),
-                                _singleField(
-                                    "Last Name", widget.leadModel["lastName"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Student Type",
-                                    widget.leadModel["studentType"]),
-                                _singleField("Apply Country",
-                                    widget.leadModel["applyCountry"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField(
-                                    "Email", widget.leadModel["email"]),
-                                _singleField("Origin Country",
-                                    widget.leadModel["originCountry"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField(
-                                    "Phone", widget.leadModel["phone"]),
-                                _singleField("Optional Phone",
-                                    widget.leadModel["optionalPhone"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Visa Issued",
-                                    widget.leadModel["visaIssued"]),
-                                _singleField("Visa Expired",
-                                    widget.leadModel["visaExpired"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Immigration History",
-                                    widget.leadModel["immigrationHistory"]),
-                                _singleField(
-                                    "Comments", widget.leadModel["comments"])
-                              ],
-                            ),
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 20, 0, 0),
+                        child: Text(
+                          widget.leadModel["firstName"],
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.cyan.shade700),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Interested Course",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
+                      SizedBox(
+                        height: 30,
                       ),
-                    ),
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Course Level",
-                                    widget.leadModel["courseLevel"]),
-                                _singleField("Intake Year",
-                                    widget.leadModel["intakeYear"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Course Title",
-                                    widget.leadModel["courseTitle"]),
-                                _singleField("Intake Month",
-                                    widget.leadModel["intakeMonth"])
-                              ],
-                            ),
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Personal Details",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Previous Education & Experience",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Previous Qualification Level",
-                                    widget.leadModel["preQLevel"]),
-                                _singleField("Recent Qualification Level",
-                                    widget.leadModel["recQLevel"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Previous Qualification Title",
-                                    widget.leadModel["preQTitle"]),
-                                _singleField("Recent Qualification Title",
-                                    widget.leadModel["recQTitle"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Work Experience",
-                                    widget.leadModel["workExperience"]),
-                                _singleField(
-                                    "Study Gap", widget.leadModel["studyGap"])
-                              ],
-                            ),
-                          ],
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("First Name",
+                                      widget.leadModel["firstName"]),
+                                  _singleField(
+                                      "Last Name", widget.leadModel["lastName"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Student Type",
+                                      widget.leadModel["studentType"]),
+                                  _singleField("Apply Country",
+                                      widget.leadModel["applyCountry"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField(
+                                      "Email", widget.leadModel["email"]),
+                                  _singleField("Origin Country",
+                                      widget.leadModel["originCountry"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField(
+                                      "Phone", widget.leadModel["phone"]),
+                                  _singleField("Optional Phone",
+                                      widget.leadModel["optionalPhone"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Visa Issued",
+                                      widget.leadModel["visaIssued"]),
+                                  _singleField("Visa Expired",
+                                      widget.leadModel["visaExpired"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Immigration History",
+                                      widget.leadModel["immigrationHistory"]),
+                                  _singleField(
+                                      "Comments", widget.leadModel["comments"])
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "English Language Test",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
+                      SizedBox(
+                        height: 20,
                       ),
-                    ),
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField(
-                                    "IELTS/WAEC", widget.leadModel["ielts"]),
-                                _singleField("IELTS/WAEC",
-                                    widget.leadModel["ieltsResult"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("English Test/Future Test Date",
-                                    widget.leadModel["ieltsDate"])
-                              ],
-                            ),
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Interested Course",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Institution Choice",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("First Choice",
-                                    widget.leadModel["firstChoice"]),
-                                _singleField("Third Choice",
-                                    widget.leadModel["thirdChoice"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Second Choice",
-                                    widget.leadModel["secondChoice"]),
-                                _singleField("Fourth Choice",
-                                    widget.leadModel["fourthChoice"])
-                              ],
-                            ),
-                          ],
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Course Level",
+                                      widget.leadModel["courseLevel"]),
+                                  _singleField("Intake Year",
+                                      widget.leadModel["intakeYear"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Course Title",
+                                      widget.leadModel["courseTitle"]),
+                                  _singleField("Intake Month",
+                                      widget.leadModel["intakeMonth"])
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "RM Use Only",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
+                      SizedBox(
+                        height: 20,
                       ),
-                    ),
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField(
-                                    "Status", widget.leadModel["status"]),
-                                _singleField("Lead Source",
-                                    widget.leadModel["leadSource"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Status Description",
-                                    widget.leadModel["statusDes"]),
-                                _singleField("Lead Source Description",
-                                    widget.leadModel["leadSourceDes"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField(
-                                    "Weightage", widget.leadModel["weightage"]),
-                                _singleField(
-                                    "Assigned", widget.leadModel["assigned"])
-                              ],
-                            ),
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Previous Education & Experience",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Documents",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _linkField("Completed Application Form",
-                                    widget.leadModel["docApplicationForm"]),
-                                _linkField("Statement of Purpose ",
-                                    widget.leadModel["docSOP"]),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _linkField("CV With 2 Reference",
-                                    widget.leadModel["docCV"]),
-                                _linkField("Passport with Visa Copy",
-                                    widget.leadModel["docPassport"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _linkField(
-                                    "All Academic Certificate & Transcript",
-                                    widget.leadModel["docAcademic"]),
-                                _linkField("Current Sponsor Confirmation",
-                                    widget.leadModel["docSponsor"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _linkField("Letter of Attendance",
-                                    widget.leadModel["docAttendance"]),
-                                _linkField("English Test",
-                                    widget.leadModel["docIELTSTest"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _linkField("Work Experience Letter",
-                                    widget.leadModel["docWorkExperience"]),
-                                _linkField("Bank Statement",
-                                    widget.leadModel["docBank"])
-                              ],
-                            ),
-                          ],
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Previous Qualification Level",
+                                      widget.leadModel["preQLevel"]),
+                                  _singleField("Recent Qualification Level",
+                                      widget.leadModel["recQLevel"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Previous Qualification Title",
+                                      widget.leadModel["preQTitle"]),
+                                  _singleField("Recent Qualification Title",
+                                      widget.leadModel["recQTitle"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Work Experience",
+                                      widget.leadModel["workExperience"]),
+                                  _singleField(
+                                      "Study Gap", widget.leadModel["studyGap"])
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Task",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
+                      SizedBox(
+                        height: 20,
                       ),
-                    ),
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Task Subject",
-                                    widget.leadModel["taskSubject"]),
-                                _singleField("Task Contact",
-                                    widget.leadModel["taskContact"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Task Due Date",
-                                    widget.leadModel["taskDueDate"]),
-                                _singleField("Task Status",   widget.leadModel["taskStatus"])
-                              ],
-                            ),
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "English Language Test",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Application",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField(
+                                      "IELTS", widget.leadModel["ielts"]),
+                                  _singleField("IELTS",
+                                      widget.leadModel["ieltsResult"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("English Test/Future Test Date",
+                                      widget.leadModel["ieltsDate"])
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Course Name",
-                                    widget.leadModel["courseName"]),
-                                _singleField("Tuition Fees",
-                                    widget.leadModel["tutionFee"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("University",
-                                    widget.leadModel["universityName"]),
-                                _singleField("Application Status",
-                                    widget.leadModel["applicationStatus"])
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Intake Month",
-                                    widget.leadModel["intakeMonthApplied"]),
-                                _singleField("Intake Year",
-                                    widget.leadModel["intakeYearApplied"])
-                              ],
-                            ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Institution Choice",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
+                        ),
+                      ),
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("First Choice",
+                                      widget.leadModel["firstChoice"]),
+                                  _singleField("Third Choice",
+                                      widget.leadModel["thirdChoice"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Second Choice",
+                                      widget.leadModel["secondChoice"]),
+                                  _singleField("Fourth Choice",
+                                      widget.leadModel["fourthChoice"])
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "RM Use Only",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
+                        ),
+                      ),
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField(
+                                      "Status", widget.leadModel["status"]),
+                                  _singleField("Lead Source",
+                                      widget.leadModel["leadSource"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Status Description",
+                                      widget.leadModel["statusDes"]),
+                                  _singleField("Lead Source Description",
+                                      widget.leadModel["leadSourceDes"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField(
+                                      "Weightage", widget.leadModel["weightage"]),
+                                  _singleField(
+                                      "Assigned", widget.leadModel["assigned"])
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Documents",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
+                        ),
+                      ),
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _linkField("Completed Application Form",
+                                      widget.leadModel["docApplicationForm"]),
+                                  _linkField("Statement of Purpose ",
+                                      widget.leadModel["docSOP"]),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _linkField("CV With 2 Reference",
+                                      widget.leadModel["docCV"]),
+                                  _linkField("Passport with Visa Copy",
+                                      widget.leadModel["docPassport"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _linkField(
+                                      "All Academic Certificate & Transcript",
+                                      widget.leadModel["docAcademic"]),
+                                  _linkField("Current Sponsor Confirmation",
+                                      widget.leadModel["docSponsor"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _linkField("Letter of Attendance",
+                                      widget.leadModel["docAttendance"]),
+                                  _linkField("English Test",
+                                      widget.leadModel["docIELTSTest"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _linkField("Work Experience Letter",
+                                      widget.leadModel["docWorkExperience"]),
+                                  _linkField("Bank Statement",
+                                      widget.leadModel["docBank"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _linkField("Recommendation Letter",
+                                      widget.leadModel["docRecommendationLetter"]),
+                                 Text("")
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Task",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
+                        ),
+                      ),
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Task Subject",
+                                      widget.leadModel["taskSubject"]),
+                                  _singleField("Task Contact",
+                                      widget.leadModel["taskContact"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Task Due Date",
+                                      widget.leadModel["taskDueDate"]),
+                                  _singleField("Task Status",   widget.leadModel["taskStatus"])
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Application",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
+                        ),
+                      ),
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Course Name",
+                                      widget.leadModel["courseName"]),
+                                  _singleField("Tuition Fees",
+                                      widget.leadModel["tutionFee"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("University",
+                                      widget.leadModel["universityName"]),
+                                  _singleField("Application Status",
+                                      widget.leadModel["applicationStatus"])
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Intake Month",
+                                      widget.leadModel["intakeMonthApplied"]),
+                                  _singleField("Intake Year",
+                                      widget.leadModel["intakeYearApplied"])
+                                ],
+                              ),
 
-                            SizedBox(
-                              height: 30,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                backButton,
-                                editButton,
-                                deleteButton,
-                                sendSMSButton,
-                                sendEmailButton
-                              ],
-                            ),
+                              SizedBox(
+                                height: 30,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  backButton,
+                                  editButton,
+                                  deleteButton,
+                                  sendSMSButton,
+                                  sendEmailButton
+                                ],
+                              ),
 
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _singleField("Modified By",
-                                    widget.leadModel["modifiedBy"]),
-                                _singleField("Modified Date",
-                                    DateFormat('yyyy-MM-dd K:mm:ss').format(widget.leadModel["modifiedDate"].toDate()))
-                              ],
-                            ),
-                          ],
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _singleField("Modified By",
+                                      widget.leadModel["modifiedBy"]),
+                                  _singleField("Modified Date",
+                                      DateFormat('yyyy-MM-dd K:mm:ss').format(widget.leadModel["modifiedDate"].toDate()))
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 50,
-                    ),
-                  ],
+                      SizedBox(
+                        height: 50,
+                      ),
+                    ],
+                  ),
                 ),
               ),
+    ]
             ),
           ),
         ],

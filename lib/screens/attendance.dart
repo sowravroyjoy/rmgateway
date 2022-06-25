@@ -1,21 +1,76 @@
+import 'dart:html';
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:rmgateway/model/attendance_model.dart';
-import 'package:rmgateway/screens/update_user.dart';
+import 'package:rmgateway/model/country_model.dart';
+import 'package:rmgateway/model/course_title_model.dart';
+import 'package:rmgateway/model/lead_model.dart';
+import 'package:rmgateway/model/student_type_model.dart';
+import 'package:rmgateway/model/university_model.dart';
+import 'package:rmgateway/screens/apply.dart';
+import 'package:rmgateway/screens/attendance.dart';
+import 'package:rmgateway/screens/create_country.dart';
+import 'package:rmgateway/screens/create_course_level.dart';
+import 'package:rmgateway/screens/create_course_title.dart';
+import 'package:rmgateway/screens/create_lead_source.dart';
+import 'package:rmgateway/screens/create_status.dart';
+import 'package:rmgateway/screens/create_weightage.dart';
+import 'package:rmgateway/screens/employee_details.dart';
+import 'package:rmgateway/screens/send_email.dart';
+import 'package:rmgateway/screens/send_sms.dart';
+import 'package:rmgateway/screens/signin.dart';
+import 'package:rmgateway/screens/single_lead.dart';
+import 'package:rmgateway/screens/today_task.dart';
+import 'package:rmgateway/screens/update_country.dart';
+import 'package:rmgateway/screens/update_course_title.dart';
+import 'package:rmgateway/screens/update_lead.dart';
+import 'package:rmgateway/screens/update_student_type.dart';
+import 'package:rmgateway/screens/update_university.dart';
+import 'package:rmgateway/screens/user_profile.dart';
 import 'package:rmgateway/screens/view_lead.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../model/attendance_model.dart';
+import 'admin_attendance.dart';
+import 'create_lead.dart';
+import 'create_student_type.dart';
+import 'create_university.dart';
 
 class Attendance extends StatefulWidget {
   final QueryDocumentSnapshot<Object?> employeeModel;
-  const Attendance({Key? key,required this.employeeModel}) : super(key: key);
+
+  const Attendance({Key? key, required this.employeeModel}) : super(key: key);
 
   @override
   State<Attendance> createState() => _AttendanceState();
 }
 
 class _AttendanceState extends State<Attendance> {
+  String? currentUserID;
+  String? currentUserName;
+
+  // Initial Selected Value
+  String userName = 'Unknown';
+
+  // List of items in our dropdown menu
+  List<String> items = [];
+
+  // List of items in our dropdown menu
+  List<String> properties = [
+    "Add Country",
+    "Add University",
+    "Add Course Level",
+    "Add Lead Source",
+    "Add Status",
+    "Add Student Type",
+    "Add Weightage"
+  ];
 
   bool _processi = false;
   bool _processo = false;
@@ -28,25 +83,38 @@ class _AttendanceState extends State<Attendance> {
   void initState() {
     // TODO: implement initState
     super.initState();
-  }
 
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    FirebaseAuth.instance.signOut();
-
+    currentUserID = FirebaseAuth.instance.currentUser?.uid;
+    FirebaseFirestore.instance
+        .collection('users')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        if (doc["userID"] == currentUserID) {
+          setState(() {
+            currentUserName = doc["name"];
+            userName = doc["name"];
+            items = [
+              userName,
+              'Logout',
+            ];
+          });
+        }
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-
     final CollectionReference _collectionReference =
-    FirebaseFirestore.instance.collection("attendance");
+        FirebaseFirestore.instance.collection("attendance");
 
     Widget _buildListView() {
       return StreamBuilder<QuerySnapshot>(
-          stream: _collectionReference.orderBy("timeStamp",  descending: true).snapshots().asBroadcastStream(),
+          stream: _collectionReference
+              .orderBy("timeStamp", descending: true)
+              .snapshots()
+              .asBroadcastStream(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Center(child: Text('Something went Wrong'));
@@ -62,23 +130,23 @@ class _AttendanceState extends State<Attendance> {
                 child: Text('Empty'),
               );
             } else {
-
               final List storedocs = [];
-              snapshot.data!.docs.where((element) => element["employeeID"] == widget.employeeModel["docID"])
+              snapshot.data!.docs
+                  .where((element) =>
+                      element["employeeID"] == widget.employeeModel["docID"])
                   .map((DocumentSnapshot document) {
                 Map a = document.data() as Map<String, dynamic>;
                 storedocs.add(a);
                 a['id'] = document.id;
               }).toList();
 
-
-
-              return  Container(
+              return Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
                 decoration: BoxDecoration(
-                    color: Colors.cyan.shade100,
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10))
-                ),
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        topRight: Radius.circular(10))),
                 child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: Table(
@@ -86,157 +154,169 @@ class _AttendanceState extends State<Attendance> {
                       columnWidths: const <int, TableColumnWidth>{
                         1: FixedColumnWidth(140),
                       },
-                      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                      defaultVerticalAlignment:
+                          TableCellVerticalAlignment.middle,
                       children: [
-                        TableRow(
-                            children: [
-                              TableCell(
-                                child: Container(
-                                  color: Colors.cyan.shade300,
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Date',
-                                        style: TextStyle(
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                        TableRow(children: [
+                          TableCell(
+                            child: Container(
+                              color: Colors.cyan.shade300,
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Date',
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          TableCell(
+                            child: Container(
+                              color: Colors.cyan.shade300,
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Name',
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          TableCell(
+                            child: Container(
+                              color: Colors.cyan.shade300,
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Clock In',
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          TableCell(
+                            child: Container(
+                              color: Colors.cyan.shade300,
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Clock Out',
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]),
+                        for (var i = 0; i < storedocs.length; i++) ...[
+                          TableRow(children: [
+                            TableCell(
+                              child: Container(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      (storedocs[i]["timeStamp"] != null)
+                                          ? DateFormat('dd-MMM-yyyy').format(
+                                              storedocs[i]["timeStamp"]
+                                                  .toDate())
+                                          : "Loading...",
+                                      style: TextStyle(
+                                        fontSize: 15.0,
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                              TableCell(
-                                child: Container(
-                                  color: Colors.cyan.shade300,
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Name',
-                                        style: TextStyle(
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                            ),
+                            TableCell(
+                              child: Container(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      storedocs[i]["employeeName"],
+                                      style: TextStyle(
+                                        fontSize: 15.0,
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                              TableCell(
-                                child: Container(
-                                  color: Colors.cyan.shade300,
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Clock In',
-                                        style: TextStyle(
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                            ),
+                            TableCell(
+                              child: Container(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      (storedocs[i]["inTimeStamp"] != null)
+                                          ? (storedocs[i]["dTimestamp"] !=
+                                                  "out")
+                                              ? DateFormat('K:mm:ss').format(
+                                                  storedocs[i]["inTimeStamp"]
+                                                      .toDate())
+                                              : "0"
+                                          : "Loading...",
+                                      style: TextStyle(
+                                        fontSize: 15.0,
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                              TableCell(
-                                child: Container(
-                                  color: Colors.cyan.shade300,
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Clock Out',
-                                        style: TextStyle(
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                            ),
+                            TableCell(
+                              child: Container(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      (storedocs[i]["outTimeStamp"] != null)
+                                          ? (storedocs[i]["dTimestamp"] ==
+                                                  "out")
+                                              ? DateFormat('K:mm:ss').format(
+                                                  storedocs[i]["outTimeStamp"]
+                                                      .toDate())
+                                              : "0"
+                                          : "Loading...",
+                                      style: TextStyle(
+                                        fontSize: 15.0,
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ]
-                        ),
-
-                        for(var i = 0 ; i< storedocs.length; i++)...[
-                          TableRow(
-                              children: [
-                                TableCell(
-                                  child: Container(
-                                    child: Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-            (  storedocs[i]["timeStamp"] != null) ?  DateFormat('dd-MMM-yyyy').format(storedocs[i]["timeStamp"].toDate()): "Loading...",
-                                          style: TextStyle(
-                                            fontSize: 15.0,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                TableCell(
-                                  child: Container(
-                                    child: Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          storedocs[i]["employeeName"],
-                                          style: TextStyle(
-                                            fontSize: 15.0,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                TableCell(
-                                  child: Container(
-                                    child: Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          (  storedocs[i]["inTimeStamp"] != null) ?   (storedocs[i]["dTimestamp"]!= "out")?  DateFormat('K:mm:ss').format(storedocs[i]["inTimeStamp"].toDate()): "0":"Loading...",
-                                          style: TextStyle(
-                                            fontSize: 15.0,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                TableCell(
-                                  child: Container(
-                                    child: Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child:  Text(
-                                          (  storedocs[i]["outTimeStamp"] != null) ? (storedocs[i]["dTimestamp"]== "out")?  DateFormat('K:mm:ss').format(storedocs[i]["outTimeStamp"] .toDate()): "0":"Loading...",
-                                          style: TextStyle(
-                                            fontSize: 15.0,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ]
-                          )
+                            ),
+                          ])
                         ]
                       ],
-                    )
-                ),
+                    )),
               );
             }
           });
     }
 
-
-    final inButton =  Material(
+    final inButton = Material(
       elevation: (_processi) ? 0 : 5,
       color: (_processi) ? Colors.pinkAccent.shade700 : Colors.pinkAccent,
       borderRadius: BorderRadius.circular(10),
@@ -255,44 +335,43 @@ class _AttendanceState extends State<Attendance> {
           });
           (_counti < 0)
               ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: Colors.red, content: Text("Wait Please!!")))
+                  backgroundColor: Colors.red, content: Text("Wait Please!!")))
               : AddInData();
         },
         child: (_processi)
             ? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Wait',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.black,
-              ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Center(
-                child: SizedBox(
-                    height: 15,
-                    width: 15,
-                    child: CircularProgressIndicator(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Wait',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
                       color: Colors.black,
-                      strokeWidth: 2,
-                    ))),
-          ],
-        )
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Center(
+                      child: SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            color: Colors.black,
+                            strokeWidth: 2,
+                          ))),
+                ],
+              )
             : Text(
-          '  Clock In  ',
-          textAlign: TextAlign.center,
-          style:
-          TextStyle(color: Colors.black),
-        ),
+                '  Clock In  ',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black),
+              ),
       ),
     );
 
-    final outButton =  Material(
+    final outButton = Material(
       elevation: (_processo) ? 0 : 5,
       color: (_processo) ? Colors.pinkAccent.shade700 : Colors.pinkAccent,
       borderRadius: BorderRadius.circular(10),
@@ -311,121 +390,464 @@ class _AttendanceState extends State<Attendance> {
           });
           (_counto < 0)
               ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: Colors.red, content: Text("Wait Please!!")))
+                  backgroundColor: Colors.red, content: Text("Wait Please!!")))
               : AddOutData();
         },
         child: (_processo)
             ? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Wait',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.black,
-              ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Center(
-                child: SizedBox(
-                    height: 15,
-                    width: 15,
-                    child: CircularProgressIndicator(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Wait',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
                       color: Colors.black,
-                      strokeWidth: 2,
-                    ))),
-          ],
-        )
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Center(
+                      child: SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            color: Colors.black,
+                            strokeWidth: 2,
+                          ))),
+                ],
+              )
             : Text(
-          '  Clock Out  ',
-          textAlign: TextAlign.center,
-          style:
-          TextStyle(color: Colors.black),
-        ),
+                '  Clock Out  ',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black),
+              ),
       ),
     );
 
+    final dropdownButtonField = DropdownButton(
+      focusColor: Colors.cyan.shade700,
+      borderRadius: BorderRadius.circular(10),
+      underline: DropdownButtonHideUnderline(child: Container()),
+      dropdownColor: Colors.white,
+      hint: Text(
+        userName,
+        style: TextStyle(color: Colors.white),
+      ),
+      icon: const Icon(
+        Icons.keyboard_arrow_down,
+        color: Colors.white,
+      ),
+      items: items.map((String items) {
+        return DropdownMenuItem(
+          value: items,
+          child: TextButton(
+            onPressed: () {
+              if (items.contains("Logout")) {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                          title: Text("Confirm"),
+                          content: Text("Do you want to log out?"),
+                          actions: [
+                            IconButton(
+                                icon: new Icon(Icons.close),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                }),
+                            IconButton(
+                                icon: new Icon(Icons.logout),
+                                onPressed: () {
+                                  FirebaseAuth.instance
+                                      .signOut()
+                                      .catchError((onError) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            backgroundColor: Colors.red,
+                                            content: Text("Log out failed!!")));
+                                    Navigator.pop(context);
+                                  }).whenComplete(() async {
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => SignIn()),
+                                        (route) => false);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            backgroundColor: Colors.green,
+                                            content: Text("Logged out!!")));
+                                    SharedPreferences _pref =
+                                        await SharedPreferences.getInstance();
+                                    _pref.remove("email");
+                                    _pref.remove("password");
+                                  });
+                                })
+                          ],
+                        ));
+              } else {
+                FirebaseFirestore.instance
+                    .collection('users')
+                    .get()
+                    .then((QuerySnapshot querySnapshot) {
+                  for (var doc in querySnapshot.docs) {
+                    if (doc["userID"].toString() == currentUserID) {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  UserProfile(userModel: doc)));
+                    }
+                  }
+                });
+              }
+            },
+            child: Text(
+              items,
+              style: TextStyle(color: Colors.cyan.shade700),
+            ),
+          ),
+        );
+      }).toList(),
+      // After selecting the desired option,it will
+      // change button value to selected value
+      onChanged: (String? newValue) {},
+    );
 
+    final propertyField = DropdownButton(
+      focusColor: Colors.cyan.shade700,
+      borderRadius: BorderRadius.circular(10),
+      underline: DropdownButtonHideUnderline(child: Container()),
+      dropdownColor: Colors.white,
+      hint: Text(
+        "Add Property",
+        style: TextStyle(color: Colors.white),
+      ),
+      icon: const Icon(
+        Icons.keyboard_arrow_down,
+        color: Colors.white,
+      ),
+      items: properties.map((String items) {
+        return DropdownMenuItem(
+          value: items,
+          child: TextButton(
+            onPressed: () {
+              if (items.contains("Add Country")) {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => CreateCountry()));
+              } else if (items.contains("Add University")) {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CreateUniversity()));
+              } else if (items.contains("Add Course Level")) {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CreateCourseLevel()));
+              } else if (items.contains("Add Course Title")) {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CreateCourseTitle()));
+              } else if (items.contains("Add Lead Source")) {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CreateLeadSource()));
+              } else if (items.contains("Add Status")) {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => CreateStatus()));
+              } else if (items.contains("Add Student Type")) {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CreateStudentType()));
+              } else if (items.contains("Add Weightage")) {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => CreateWeightage()));
+              }
+            },
+            child: Text(
+              items,
+              style: TextStyle(color: Colors.cyan.shade700),
+            ),
+          ),
+        );
+      }).toList(),
+      // After selecting the desired option,it will
+      // change button value to selected value
+      onChanged: (String? newValue) {},
+    );
 
-
+    final widthDrawer = MediaQuery.of(context).size.width / 6;
+    final widthMain = widthDrawer * 5;
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text("Please Ensure Your Attendance", style: TextStyle(color: Colors.black),),
-        backgroundColor: Colors.cyan.shade100,
-        leading: IconButton(
-          onPressed: (){
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => ViewLead()));
-          },
-          icon: Icon(
-            Icons.home_rounded,
-            color: Colors.cyan.shade700,
-          ),
-        ),
-      ),
-      body: Container(
-        child: Column(
-          children: [
-            SizedBox(height: 10,),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
+      body: Row(
+        children: [
+          Container(
+            width: widthDrawer,
+            height: MediaQuery.of(context).size.height,
+            decoration: BoxDecoration(color: Colors.cyan.shade700),
+            child: SingleChildScrollView(
+              child: Column(
                 children: [
-                  inButton,
-                  outButton
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                        width: 80,
+                        height: 80,
+                        child: CircleAvatar(
+                          backgroundImage: AssetImage(
+                            "assets/images/demo.jpeg",
+                          ),
+                        )),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                    child: dropdownButtonField,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                    child: Divider(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ViewLead()));
+                      },
+                      child: Text(
+                        "Leads",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      )),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TodayTask(
+                                      currentUserName:
+                                          currentUserName.toString(),
+                                    )));
+                      },
+                      child: Text(
+                        "Today's Task",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      )),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CreateLead()));
+                      },
+                      child: Text(
+                        "Create Lead",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      )),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        FirebaseFirestore.instance
+                            .collection('users')
+                            .get()
+                            .then((QuerySnapshot querySnapshot) {
+                          for (var doc in querySnapshot.docs) {
+                            if (doc["userID"].toString() == currentUserID &&
+                                doc["userType"].toString().toLowerCase() ==
+                                    "admin") {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => EmployeeDetails()));
+                            }
+                          }
+                        });
+                      },
+                      child: Text(
+                        "Employee Details",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      )),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        FirebaseFirestore.instance
+                            .collection('users')
+                            .get()
+                            .then((QuerySnapshot querySnapshot) {
+                          for (var doc in querySnapshot.docs) {
+                            if (doc["userID"].toString() == currentUserID &&
+                                doc["userType"].toString().toLowerCase() ==
+                                    "admin") {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AdminAttendance()));
+                            } else if (doc["userID"].toString() ==
+                                currentUserID) {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          Attendance(employeeModel: doc)));
+                            }
+                          }
+                        });
+                      },
+                      child: Text(
+                        "Attendance",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      )),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(context,
+                            MaterialPageRoute(builder: (context) => SendSMS()));
+                      },
+                      child: Text(
+                        "Sms",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      )),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SendEmail()));
+                      },
+                      child: Text(
+                        "Email",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      )),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(context,
+                            MaterialPageRoute(builder: (context) => Apply()));
+                      },
+                      child: Text(
+                        "Apply",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      )),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  propertyField
                 ],
               ),
             ),
-            SizedBox(height: 10,),
-            Expanded(child: _buildListView())
-          ],
-        ),
+          ),
+          Expanded(
+            child: Stack(children: [
+              Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width / 2,
+                  height: MediaQuery.of(context).size.height / 2,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage("assets/images/demo.jpeg"),
+                        fit: BoxFit.cover,
+                        opacity: 0.09),
+                  ),
+                ),
+              ),
+              Container(
+                width: widthMain,
+                height: MediaQuery.of(context).size.height,
+
+                child: SingleChildScrollView(
+                    child: Column(
+                  children: [
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [inButton, outButton],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    _buildListView()
+                  ],
+                )),
+              ),
+            ]),
+          ),
+        ],
       ),
     );
   }
 
-
-  void AddInData() async{
-
+  void AddInData() async {
     final ref = FirebaseFirestore.instance.collection("attendance").doc();
 
     AttendanceModel attendanceModel = AttendanceModel();
     attendanceModel.timeStamp = FieldValue.serverTimestamp();
-    attendanceModel.inTimeStamp =  FieldValue.serverTimestamp();
+    attendanceModel.inTimeStamp = FieldValue.serverTimestamp();
     attendanceModel.outTimeStamp = FieldValue.serverTimestamp();
     attendanceModel.employeeID = widget.employeeModel["docID"];
     attendanceModel.employeeName = widget.employeeModel["name"];
     attendanceModel.dTimestamp = "in";
     attendanceModel.docID = ref.id;
     await ref.set(attendanceModel.toMap());
-      setState(() {
-        _processi = false;
-        _counti = 1;
-      });
+    setState(() {
+      _processi = false;
+      _counti = 1;
+    });
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.green, content: Text("Clock In Added!!")));
-    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.green, content: Text("Clock In Added!!")));
+  }
 
-
-  void AddOutData() async{
+  void AddOutData() async {
     final ref = FirebaseFirestore.instance.collection("attendance").doc();
-      AttendanceModel attendanceModel = AttendanceModel();
-      attendanceModel.timeStamp =FieldValue.serverTimestamp();
-    attendanceModel.inTimeStamp =  FieldValue.serverTimestamp();
-      attendanceModel.outTimeStamp = FieldValue.serverTimestamp();
-      attendanceModel.employeeID = widget.employeeModel["docID"];
-      attendanceModel.employeeName = widget.employeeModel["name"];
-      attendanceModel.dTimestamp = "out";
-      attendanceModel.docID = ref.id;
-     await ref.set(attendanceModel.toMap());
+    AttendanceModel attendanceModel = AttendanceModel();
+    attendanceModel.timeStamp = FieldValue.serverTimestamp();
+    attendanceModel.inTimeStamp = FieldValue.serverTimestamp();
+    attendanceModel.outTimeStamp = FieldValue.serverTimestamp();
+    attendanceModel.employeeID = widget.employeeModel["docID"];
+    attendanceModel.employeeName = widget.employeeModel["name"];
+    attendanceModel.dTimestamp = "out";
+    attendanceModel.docID = ref.id;
+    await ref.set(attendanceModel.toMap());
     setState(() {
       _processo = false;
       _counto = 1;

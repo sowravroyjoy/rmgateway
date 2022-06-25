@@ -397,6 +397,25 @@ class _SignInState extends State<SignIn> {
         }
       });
     } else{
+      _auth.currentUser!.sendEmailVerification().whenComplete((){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.green, content: Text("Verification email sent!!")));
+        setState(() {
+          _process = false;
+          _count = 1;
+          emailEditingController.clear();
+          passwordEditingController.clear();
+        });
+      }).onError((error, stackTrace){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.red, content: Text("Verification email sent failed!!")));
+        setState(() {
+          _process = false;
+          _count = 1;
+          emailEditingController.clear();
+          passwordEditingController.clear();
+        });
+      });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Colors.red, content: Text("Please verify your email!!")));
       setState(() {

@@ -43,6 +43,7 @@ class LeadModel {
   String? docSponsor;
   String? docIELTSTest;
   String? docBank;
+  String? docRecommendationLetter;
   String? docApplicationFormLink;
   String? docCVLink;
   String? docAcademicLink;
@@ -53,6 +54,7 @@ class LeadModel {
   String? docSponsorLink;
   String? docIELTSTestLink;
   String? docBankLink;
+  String? docRecommendationLetterLink;
   String? status;
   String? statusDes;
   String? leadSource;
@@ -116,6 +118,7 @@ class LeadModel {
     this.docSponsor,
     this.docIELTSTest,
     this.docBank,
+    this.docRecommendationLetter,
     this.docApplicationFormLink,
     this.docCVLink,
     this.docAcademicLink,
@@ -126,6 +129,7 @@ class LeadModel {
     this.docSponsorLink,
     this.docIELTSTestLink,
     this.docBankLink,
+    this.docRecommendationLetterLink,
     this.status,
     this.statusDes,
     this.leadSource,
@@ -191,6 +195,7 @@ class LeadModel {
       docSponsor: map['docSponsor'],
       docIELTSTest: map['docIELTSTest'],
       docBank: map["docBank"],
+      docRecommendationLetter: map["docRecommendationLetter"],
       docApplicationFormLink: map['docApplicationFormLink'],
       docCVLink: map["docCVLink"],
       docAcademicLink: map["docAcademicLink"],
@@ -201,6 +206,7 @@ class LeadModel {
       docSponsorLink: map['docSponsorLink'],
       docIELTSTestLink: map['docIELTSTestLink'],
       docBankLink: map["docBankLink"],
+      docRecommendationLetterLink: map["docRecommendationLetterLink"],
       status: map["status"],
       statusDes: map['statusDes'],
       leadSource: map['leadSource'],
@@ -266,6 +272,7 @@ class LeadModel {
       "docSponsor":docSponsor,
       "docIELTSTest":docIELTSTest,
       'docBank': docBank,
+      'docRecommendationLetter': docRecommendationLetter,
       "docApplicationFormLink":docApplicationFormLink,
       'docCVLink': docCVLink,
       'docAcademicLink': docAcademicLink,
@@ -276,6 +283,7 @@ class LeadModel {
       "docSponsorLink":docSponsorLink,
       "docIELTSTestLink":docIELTSTestLink,
       'docBankLink': docBankLink,
+      'docRecommendationLetterLink': docRecommendationLetterLink,
       'status': status,
       "statusDes":statusDes,
       "leadSource":leadSource,

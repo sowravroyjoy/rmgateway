@@ -20,15 +20,69 @@ class _CreateUniversityState extends State<CreateUniversity> {
   bool? _process;
   int? _count;
 
+  final List<String> _applyCountryTypes = [];
+  String? _chosenApplyCountry;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _process = false;
     _count = 1;
+
+
+    FirebaseFirestore.instance
+        .collection('countries')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        setState(() {
+          _applyCountryTypes.add(doc["name"]);
+        });
+      }
+    });
   }
   @override
   Widget build(BuildContext context) {
+    DropdownMenuItem<String> buildMenuApplyCountry(String item) =>
+        DropdownMenuItem(
+            value: item,
+            child: Text(
+              item,
+              style: TextStyle(color: Colors.black),
+            ));
+
+    final applyCountryDropdown = Container(
+        width: MediaQuery.of(context).size.width / 3,
+        child: DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.fromLTRB(
+                20,
+                15,
+                20,
+                15,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.cyan),
+              ),
+            ),
+            items: _applyCountryTypes.map(buildMenuApplyCountry).toList(),
+            hint: Text(
+              'Address',
+              style: TextStyle(color: Colors.black),
+            ),
+            value: _chosenApplyCountry,
+            onChanged: (newValue) {
+              setState(() {
+                _chosenApplyCountry = newValue;
+              });
+            }));
+
+
     final nameField = Container(
         width: MediaQuery.of(context).size.width / 3,
         child: TextFormField(
@@ -431,7 +485,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
                   children: <Widget>[
                     nameField,
                     SizedBox(height: 20,),
-                    addressField,
+                    applyCountryDropdown,
                     SizedBox(height: 30,),
                     createButton,
                     SizedBox(height: 10,),
@@ -458,7 +512,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
       universityModel.timeStamp = FieldValue.serverTimestamp();
       universityModel.userID = ref.id;
       universityModel.name = nameEditingController.text;
-      universityModel.address = addressEditingController.text;
+      universityModel.address = _chosenApplyCountry;
       universityModel.docID = ref.id;
       ref.set(universityModel.toMap());
 
@@ -468,6 +522,7 @@ class _CreateUniversityState extends State<CreateUniversity> {
         _count = 1;
         nameEditingController.clear();
         addressEditingController.clear();
+        _chosenApplyCountry = null;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

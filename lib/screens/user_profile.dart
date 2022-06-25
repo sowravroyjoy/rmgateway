@@ -53,7 +53,9 @@ String? networkImage;
         .whenComplete((){
       setState(() {
       });
-    });
+    }).onError((error, stackTrace){
+      return "";
+   });
   }
 
   @override
@@ -137,7 +139,7 @@ String? networkImage;
                     backgroundImage: NetworkImage(
                       networkImage!
                     ),
-                  ):Center(child: CircularProgressIndicator(),),
+                  ):Text("No Image Available", style: TextStyle(color: Colors.white),),
                   SizedBox(height: 20,),
                   _singleField("Name", widget.userModel["name"]),
                   SizedBox(height: 20,),

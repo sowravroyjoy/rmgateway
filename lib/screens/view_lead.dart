@@ -103,7 +103,6 @@ class _ViewLeadState extends State<ViewLead> {
     "Add Country",
     "Add University",
     "Add Course Level",
-    "Add Course Title",
     "Add Lead Source",
     "Add Status",
     "Add Student Type",
@@ -888,7 +887,7 @@ class _ViewLeadState extends State<ViewLead> {
               return Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.transparent,
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(10),
                         topRight: Radius.circular(10))),
@@ -1565,7 +1564,7 @@ class _ViewLeadState extends State<ViewLead> {
                         height: 80,
                         child: CircleAvatar(
                           backgroundImage: AssetImage(
-                            "assets/images/demo.jpg",
+                            "assets/images/demo.jpeg",
                           ),
                         )),
                   ),
@@ -1732,58 +1731,74 @@ class _ViewLeadState extends State<ViewLead> {
             ),
           ),
           Expanded(
-            child: Container(
-              width: widthMain,
-              height: MediaQuery.of(context).size.height,
-              child: SingleChildScrollView(
-                  child: Column(
-                children: [
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20.0, vertical: 20.0),
-                              decoration: BoxDecoration(
-                                  color: Colors.pink.shade100,
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Text("Total Leads  :  $totalLeads"),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            advanceButton
-                          ],
+            child: Stack(
+              children:<Widget>[
+
+                Center(
+                  child: Container(
+              width: MediaQuery.of(context).size.width/2,
+              height: MediaQuery.of(context).size.height/2,
+              decoration: BoxDecoration(
+                  image: DecorationImage(image: AssetImage("assets/images/demo.jpeg"), fit: BoxFit.cover,opacity: 0.09),
+              ),
+            ),
+                ),
+
+
+                Container(
+                width: widthMain,
+                height: MediaQuery.of(context).size.height,
+                child: SingleChildScrollView(
+                    child: Column(
+                  children: [
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 20.0, vertical: 20.0),
+                                decoration: BoxDecoration(
+                                    color: Colors.pink.shade100,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Text("Total Leads  :  $totalLeads"),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              advanceButton
+                            ],
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            nameSearchField,
-                            SizedBox(
-                              height: 20,
-                            ),
-                            cancelFilterButton
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  _buildListView()
-                ],
-              )),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              nameSearchField,
+                              SizedBox(
+                                height: 20,
+                              ),
+                              cancelFilterButton
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    _buildListView()
+                  ],
+                )),
+              ),
+            ]
             ),
           ),
         ],

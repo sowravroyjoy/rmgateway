@@ -68,6 +68,7 @@ class _UpdateLeadState extends State<UpdateLead> {
   var taskSubjectEditingController  ;
   var taskContactEditingController  ;
   var courseNameEditingController  ;
+  var courseTitleEditingController  ;
   var tutionFeeEditingController ;
   var applicationStatusEditingController  ;
 
@@ -83,7 +84,7 @@ class _UpdateLeadState extends State<UpdateLead> {
 
 
   // List of items in our dropdown menu
-  List<String> properties = ["Add Country", "Add University", "Add Course Level", "Add Course Title", "Add Lead Source","Add Status","Add Student Type","Add Weightage"];
+  List<String> properties = ["Add Country", "Add University", "Add Course Level", "Add Lead Source","Add Status","Add Student Type","Add Weightage"];
 
   final List<String> _studentTypes = [];
   String? _chosenStudentType;
@@ -256,6 +257,11 @@ class _UpdateLeadState extends State<UpdateLead> {
   String? bankName;
   String? bankLink;
 
+  Uint8List? recommendationLetter;
+  String? recommendationLetterName;
+  String? recommendationLetterLink;
+
+
 
   @override
   void initState() {
@@ -330,16 +336,16 @@ class _UpdateLeadState extends State<UpdateLead> {
       }
     });
 
-    FirebaseFirestore.instance
-        .collection('coursetitles')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        setState(() {
-          _courseTitleTypes.add(doc["name"]);
-        });
-      }
-    });
+    // FirebaseFirestore.instance
+    //     .collection('coursetitles')
+    //     .get()
+    //     .then((QuerySnapshot querySnapshot) {
+    //   for (var doc in querySnapshot.docs) {
+    //     setState(() {
+    //       _courseTitleTypes.add(doc["name"]);
+    //     });
+    //   }
+    // });
 
     FirebaseFirestore.instance
         .collection('status')
@@ -368,13 +374,15 @@ class _UpdateLeadState extends State<UpdateLead> {
         .get()
         .then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
-        setState(() {
-          _universities.add(doc["name"]);
-          _firstChoices.add(doc["name"]);
-          _secondChoices.add(doc["name"]);
-          _thirdChoices.add(doc["name"]);
-          _fourthChoices.add(doc["name"]);
-        });
+        if(doc["address"].toString().toLowerCase() == _chosenApplyCountry.toString().toLowerCase()){
+          setState(() {
+            _universities.add(doc["name"]);
+            _firstChoices.add(doc["name"]);
+            _secondChoices.add(doc["name"]);
+            _thirdChoices.add(doc["name"]);
+            _fourthChoices.add(doc["name"]);
+          });
+        }
       }
     });
 
@@ -410,13 +418,14 @@ class _UpdateLeadState extends State<UpdateLead> {
      courseNameEditingController = new TextEditingController(text: widget.leadModel["courseName"]);
      tutionFeeEditingController = new TextEditingController(text: widget.leadModel["tutionFee"]);
      applicationStatusEditingController = new TextEditingController(text: widget.leadModel["applicationStatus"]);
+    courseTitleEditingController = new TextEditingController(text: widget.leadModel["courseTitle"]);
 
 
   //   dropdown
     _chosenStudentType = widget.leadModel["studentType"];
     _chosenApplyCountry = widget.leadModel["applyCountry"];
     _chosenCourseLevel = widget.leadModel["courseLevel"];
-    _chosenCourseTitle = widget.leadModel["courseTitle"];
+    // _chosenCourseTitle = widget.leadModel["courseTitle"];
     _chosenIntakeYear = widget.leadModel["intakeYear"];
     _chosenIntakeMonth = widget.leadModel["intakeMonth"];
     _chosenPreQLevel = widget.leadModel["preQLevel"];
@@ -464,6 +473,7 @@ class _UpdateLeadState extends State<UpdateLead> {
     sponsorName = widget.leadModel["docSponsor"];
     ieltsTestName = widget.leadModel["docIELTSTest"];
     bankName = widget.leadModel["docBank"];
+    recommendationLetterName = widget.leadModel["docRecommendationLetter"];
 
 
   }
@@ -472,6 +482,48 @@ class _UpdateLeadState extends State<UpdateLead> {
 
   @override
   Widget build(BuildContext context) {
+    final _docRecommendationLetter = Container(
+      child: Row(
+        children: [
+
+          Material(
+            elevation: 5,
+            color: Colors.cyan,
+            borderRadius: BorderRadius.circular(10),
+            child: MaterialButton(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                15,
+                20,
+                15,
+              ),
+              minWidth: MediaQuery.of(context).size.width / 5,
+              onPressed: () {
+                selectRecommendationLetter();
+              },
+              child: Text(
+                recommendationLetterName
+                    ?? 'No File Selected',
+                textAlign: TextAlign.center,
+                style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 25,
+          ),
+          Text(
+            ' :  Recommendation Letter ',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+
+        ],
+      ),
+    );
     final _docBank = Container(
       child: Row(
         children: [
@@ -2046,6 +2098,42 @@ class _UpdateLeadState extends State<UpdateLead> {
                 borderSide: BorderSide(color: Colors.cyan),
               ),
             )));
+    final courseTitleField = Container(
+        width: MediaQuery.of(context).size.width / 3,
+        child: TextFormField(
+            cursorColor: Colors.cyan,
+            autofocus: false,
+            controller: courseTitleEditingController,
+            keyboardType: TextInputType.name,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return ("field cannot be empty!!");
+              }
+              return null;
+            },
+            onSaved: (value) {
+              courseTitleEditingController.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.fromLTRB(
+                20,
+                15,
+                20,
+                15,
+              ),
+              labelText: 'Course Title',
+              labelStyle: TextStyle(color: Colors.black),
+              floatingLabelStyle: TextStyle(color: Colors.cyan),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.cyan),
+              ),
+            )));
+
     final leadSourceDescriptionField = Container(
         width: MediaQuery.of(context).size.width / 3,
         child: TextFormField(
@@ -2828,7 +2916,7 @@ class _UpdateLeadState extends State<UpdateLead> {
                         height: 80,
                         child: CircleAvatar(
                           backgroundImage: AssetImage(
-                            "assets/images/demo.jpg",
+                            "assets/images/demo.jpeg",
                           ),
                         )
                     ),
@@ -2990,449 +3078,467 @@ class _UpdateLeadState extends State<UpdateLead> {
             ),
           ),
           Expanded(
+            child: Stack(
+              children: [
+            Center(
             child: Container(
-              width: widthMain,
-              height: MediaQuery.of(context).size.height,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children:<Widget> [
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 20, 0, 0),
-                      child: Text(
-                        "Edit Lead",
-                        style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.cyan.shade700),
+            width: MediaQuery.of(context).size.width/2,
+            height: MediaQuery.of(context).size.height/2,
+            decoration: BoxDecoration(
+              image: DecorationImage(image: AssetImage("assets/images/demo.jpeg"), fit: BoxFit.cover,opacity: 0.09),
+            ),
+          ),
+    ),
+            Container(
+                width: widthMain,
+                height: MediaQuery.of(context).size.height,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children:<Widget> [
+                      SizedBox(
+                        height: 20,
                       ),
-                    ),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Edit Personal Details",
-                        style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
-                      ),
-                    ),
-
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[firstNameField, lastNameField],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[studentTypeDropdown, applyCountryDropdown],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[emailField, originCountryField],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[phoneField, optionalPhoneField],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[_visaIssuedField, _visaExpiredField],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[immigrationHistoryField, commentsField],
-                            ),
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 20, 0, 0),
+                        child: Text(
+                          "Edit Lead",
+                          style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.cyan.shade700),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Interested Course",
-                        style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+                      SizedBox(
+                        height: 30,
                       ),
-                    ),
-
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[courseLevelDropdown, intakeYearDropdown],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[courseTitleDropdown, intakeMonthDropdown],
-                            ),
-
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Edit Personal Details",
+                          style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
                         ),
                       ),
-                    ),
 
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Previous Education & Experience",
-                        style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
-                      ),
-                    ),
-
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[preQLevelDropdown, recQLevelDropdown],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[preQTitleField, recQTitleField],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[workExperienceField, studyGapField],
-                            ),
-
-                          ],
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[firstNameField, lastNameField],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[studentTypeDropdown, applyCountryDropdown],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[emailField, originCountryField],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[phoneField, optionalPhoneField],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[_visaIssuedField, _visaExpiredField],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[immigrationHistoryField, commentsField],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-
-
-
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "English Language Test",
-                        style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+                      SizedBox(
+                        height: 20,
                       ),
-                    ),
-
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[ieltsDropdown, ieltsResultField],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[_ieltsDateField],
-                            ),
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Interested Course",
+                          style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
                         ),
                       ),
-                    ),
 
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Institution Choice",
-                        style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
-                      ),
-                    ),
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[courseLevelDropdown, intakeYearDropdown],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[courseTitleField, intakeMonthDropdown],
+                              ),
 
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[firstChoiceDropdown, thirdChoiceDropdown],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[secondChoiceDropdown, fourthChoiceDropdown],
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
 
-
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "RM Use Only",
-                        style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+                      SizedBox(
+                        height: 20,
                       ),
-                    ),
-
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[statusDropdown, leadSourceDropdown],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[statusDesField, leadSourceDescriptionField],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[weightageDropdown, assignedDropdown],
-                            ),
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Previous Education & Experience",
+                          style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
                         ),
                       ),
-                    ),
 
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[preQLevelDropdown, recQLevelDropdown],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[preQTitleField, recQTitleField],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[workExperienceField, studyGapField],
+                              ),
 
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Upload Documents",
-                        style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
-                      ),
-                    ),
-
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[_docApplicationForm, _docSOP],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[_docCV, _docPassport],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[_docAcademic, _docSponsor],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[_docAttendance, _docIELTS],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[_docWorkExperience, _docBank],
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
 
 
 
-
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Create Task",
-                        style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+                      SizedBox(
+                        height: 20,
                       ),
-                    ),
-
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[taskSubjectField, taskContactField],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[_taskDueDateField],
-                            ),
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "English Language Test",
+                          style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
                         ),
                       ),
-                    ),
 
-
-
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                      child: Divider(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                      child: Text(
-                        "Application",
-                        style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
-                      ),
-                    ),
-
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[courseNameField, tutionFeeField],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[universityDropdown,applicationStatusField],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[intakeMonthAppliedDropdown,intakeYearAppliedDropdown],
-                            ),
-                          ],
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[ieltsDropdown, ieltsResultField],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[_ieltsDateField],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 20,),
-                    Center(child: createButton),
-                    SizedBox(height: 50,),
-                  ],
+
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Institution Choice",
+                          style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+                        ),
+                      ),
+
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[firstChoiceDropdown, thirdChoiceDropdown],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[secondChoiceDropdown, fourthChoiceDropdown],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "RM Use Only",
+                          style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+                        ),
+                      ),
+
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[statusDropdown, leadSourceDropdown],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[statusDesField, leadSourceDescriptionField],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[weightageDropdown, assignedDropdown],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Upload Documents",
+                          style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+                        ),
+                      ),
+
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[_docApplicationForm, _docSOP],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[_docCV, _docPassport],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[_docAcademic, _docSponsor],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[_docAttendance, _docIELTS],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[_docWorkExperience, _docBank],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[_docRecommendationLetter, Text("")],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+
+
+
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Create Task",
+                          style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+                        ),
+                      ),
+
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[taskSubjectField, taskContactField],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[_taskDueDateField],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+
+
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        child: Divider(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                        child: Text(
+                          "Application",
+                          style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+                        ),
+                      ),
+
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[courseNameField, tutionFeeField],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[universityDropdown,applicationStatusField],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[intakeMonthAppliedDropdown,intakeYearAppliedDropdown],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20,),
+                      Center(child: createButton),
+                      SizedBox(height: 50,),
+                    ],
+                  ),
                 ),
               ),
+                    ]
             ),
           ),
         ],
@@ -3531,6 +3637,15 @@ class _UpdateLeadState extends State<UpdateLead> {
     });
   }
 
+  Future selectRecommendationLetter()async{
+    final result = await FilePicker.platform.pickFiles(allowMultiple: false);
+    if(result == null) return;
+    setState(() {
+      recommendationLetter = result.files.single.bytes;
+      recommendationLetterName = result.files.single.name;
+    });
+  }
+
   void AddData() async {
     try{
       final ref =   FirebaseFirestore.instance.collection("leads").doc(widget.leadModel["docID"]);
@@ -3587,7 +3702,7 @@ class _UpdateLeadState extends State<UpdateLead> {
     leadModel.immigrationHistory = immigrationHistoryEditingController.text;
     leadModel.comments = commentsEditingController.text;
     leadModel.courseLevel = _chosenCourseLevel;
-    leadModel.courseTitle = _chosenCourseTitle;
+    leadModel.courseTitle = courseTitleEditingController.text;
     leadModel.intakeYear = _chosenIntakeYear;
     leadModel.intakeMonth = _chosenIntakeMonth;
     leadModel.preQLevel = _chosenPreQLevel;
@@ -3613,6 +3728,7 @@ class _UpdateLeadState extends State<UpdateLead> {
     leadModel.docSponsor = sponsorName;
     leadModel.docIELTSTest = ieltsTestName;
     leadModel.docBank = bankName;
+    leadModel.docRecommendationLetter = recommendationLetterName;
     leadModel.status = _chosenStatus;
     leadModel.statusDes = statusDesEditingController.text;
     leadModel.leadSource =_chosenLeadSource;
@@ -3650,6 +3766,7 @@ class _UpdateLeadState extends State<UpdateLead> {
     sponsor = await  FirebaseStorage.instance.ref().child("files/${widget.leadModel["docID"]}/${widget.leadModel["docSponsor"]}").getData(oneMegabyte);
     ieltsTest = await  FirebaseStorage.instance.ref().child("files/${widget.leadModel["docID"]}/${widget.leadModel["docIELTSTest"]}").getData(oneMegabyte);
     bank = await  FirebaseStorage.instance.ref().child("files/${widget.leadModel["docID"]}/${widget.leadModel["docBank"]}").getData(oneMegabyte);
+    recommendationLetter = await  FirebaseStorage.instance.ref().child("files/${widget.leadModel["docID"]}/${widget.leadModel["docRecommendationLetter"]}").getData(oneMegabyte);
   }
 
   Future<bool> uploadFiles(String id, DocumentReference<Map<String, dynamic>> ref) async{
@@ -3664,6 +3781,18 @@ class _UpdateLeadState extends State<UpdateLead> {
     bool bSponsor = true;
     bool bIelts = true;
     bool bBank = true;
+    bool bRecommendationLetter = true;
+
+    if(recommendationLetterName!=null){
+      UploadTask taskRecommendationLetter=   FirebaseStorage.instance.ref().child("files/$id/$recommendationLetterName").putData(recommendationLetter!);
+      await taskRecommendationLetter.whenComplete((){
+        bRecommendationLetter = true;
+      }).catchError((onError){
+        bRecommendationLetter = false;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.red, content: Text("Recommendation Letter upload failed!!")));
+      });
+    }
 
     if(applicationFormName!=null && applicationFormName != widget.leadModel["docApplicationForm"]){
       UploadTask taskApplicationForm =   FirebaseStorage.instance.ref().child("files/$id/$applicationFormName").putData(applicationForm!);
@@ -3778,7 +3907,7 @@ class _UpdateLeadState extends State<UpdateLead> {
       });
     }
 
-    if(bApplicationForm && bCV && bAcademic && bAttendance && bWorkExperience && bSOP && bPassport & bSponsor && bIelts && bBank){
+    if(bApplicationForm && bCV && bAcademic && bAttendance && bWorkExperience && bSOP && bPassport & bSponsor && bIelts && bBank && bRecommendationLetter){
       return true;
     }else{
       return false;

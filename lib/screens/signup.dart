@@ -26,7 +26,7 @@ class _SignUpState extends State<SignUp> {
   final emailEditingController = new TextEditingController();
   final passwordEditingController = new TextEditingController();
 
-  final _userTypes = [ 'Employee', 'Manager'];
+  final _userTypes = [ 'Employee', 'Manager', 'Councilor','Senior Councilor','Admission Officer','Senior Admission Officer','Marketing Officer', 'Senior Marketing Officer','CEO','Office Assistant','Complaint Officer'];
   String? _chosenUser;
   bool? _process;
   int? _count;
@@ -245,7 +245,7 @@ class _SignUpState extends State<SignUp> {
               : signUp();
         },
         child: (_process!)
-            ? Row(
+            ? (file != null)?Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -265,6 +265,30 @@ class _SignUpState extends State<SignUp> {
                     width: 15,
                     child: CircularProgressIndicator(
                       value: progress / 100,
+                      color: Colors.black,
+                      strokeWidth: 2,
+                    ))),
+          ],
+        )
+        :Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Wait',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Center(
+                child: SizedBox(
+                    height: 15,
+                    width: 15,
+                    child: CircularProgressIndicator(
                       color: Colors.black,
                       strokeWidth: 2,
                     ))),
@@ -349,43 +373,41 @@ class _SignUpState extends State<SignUp> {
         title: Center(child: Text("Create User")),
         titleTextStyle: TextStyle(fontSize: 20),
         scrollable: true,
-        content: SingleChildScrollView(
-          child: Container(
-            child: Padding(
-              padding: const EdgeInsets.all(50.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    nameField,
-                    SizedBox(height: 20,),
-                    contactField,
-                    SizedBox(height: 20,),
-                    emailField,
-                    SizedBox(height: 20,),
-                    passwordField,
-                    SizedBox(height: 20,),
-                    userDropdown,
-                    SizedBox(height: 20,),
-                    selectButton,
-                    Text(
-                      imageName!,
-                      style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 15
-                      ),
+        content: Container(
+          child: Padding(
+            padding: const EdgeInsets.all(50.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  nameField,
+                  SizedBox(height: 20,),
+                  contactField,
+                  SizedBox(height: 20,),
+                  emailField,
+                  SizedBox(height: 20,),
+                  passwordField,
+                  SizedBox(height: 20,),
+                  userDropdown,
+                  SizedBox(height: 20,),
+                  selectButton,
+                  Text(
+                    imageName!,
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 15
                     ),
-                    SizedBox(height: 20,),
-                    createButton,
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(100, 0, 0, 0),
-                      child: signInButton,
-                    ),
-                    SizedBox(height: 40,),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: 20,),
+                  createButton,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(100, 0, 0, 0),
+                    child: signInButton,
+                  ),
+                  SizedBox(height: 40,),
+                ],
               ),
             ),
           ),
@@ -395,7 +417,7 @@ class _SignUpState extends State<SignUp> {
   }
 
   void signUp()async{
-    if(_formKey.currentState!.validate() && _chosenUser != null && fileName != null){
+    if(_formKey.currentState!.validate() && _chosenUser != null){
           await _auth.createUserWithEmailAndPassword(email: emailEditingController.text, password: passwordEditingController.text)
               .then((value) => {
                postDetailsToFirestore()
@@ -432,19 +454,31 @@ class _SignUpState extends State<SignUp> {
    userModel.userType = _chosenUser;
    userModel.imageUrl = fileName;
    userModel.docID = ref.id;
-   ref.set(userModel.toMap());
+   ref.set(userModel.toMap()).whenComplete((){
+     if(file != null){
+       UploadTask task = FirebaseStorage.instance.ref().child("files/${ref.id}/$fileName").putData(file!);
 
-   UploadTask task = FirebaseStorage.instance.ref().child("files/${ref.id}/$fileName").putData(file!);
+       task.snapshotEvents.listen((event) {
+         setState(() {
+           progress = ((event.bytesTransferred.toDouble() / event.totalBytes.toDouble()) * 100).roundToDouble();
+         });
 
-   task.snapshotEvents.listen((event) {
-     setState(() {
-       progress = ((event.bytesTransferred.toDouble() / event.totalBytes.toDouble()) * 100).roundToDouble();
-     });
+         if(progress == 100){
+           setState(() {
+             _process = false;
+           });
+           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+               backgroundColor: Colors.green, content: Text("User Created!!")));
 
-     if(progress == 100){
-       setState(() {
-         _process = false;
+           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+               backgroundColor: Colors.green, content: Text("Verification email sent!!")));
+
+           Navigator.pushAndRemoveUntil(
+               context, MaterialPageRoute(builder: (context) => SignIn()), (route) => false);
+         }
        });
+
+     }else{
        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
            backgroundColor: Colors.green, content: Text("User Created!!")));
 
@@ -455,6 +489,7 @@ class _SignUpState extends State<SignUp> {
            context, MaterialPageRoute(builder: (context) => SignIn()), (route) => false);
      }
    });
+
   }
 
   Future selectFile()async{
