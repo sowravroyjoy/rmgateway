@@ -23,7 +23,9 @@ import 'package:rmgateway/screens/update_university.dart';
 import 'package:rmgateway/screens/update_user.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:rmgateway/screens/view_lead.dart';
+import 'package:rmgateway/utils/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +40,7 @@ void main() async{
         measurementId: "G-6LWLJGK1TS"
     ),
   );
+  setPathUrlStrategy();
   SharedPreferences _pref = await SharedPreferences.getInstance();
   var _email = _pref.getString('email');
   runApp( MyApp(email: _email));
@@ -76,7 +79,12 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home:  email == null? SignIn() :ViewLead(),
+      // home:  email == null? SignIn() :ViewLead(),
+
+      routes: {
+        "/": (context) =>email == null? SignIn() :ViewLead(),
+        MyRoutes.applyRoute: (context) => Apply(),
+      },
     );
   }
 }

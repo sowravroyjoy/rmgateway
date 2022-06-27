@@ -34,6 +34,7 @@ import 'package:rmgateway/screens/update_student_type.dart';
 import 'package:rmgateway/screens/update_university.dart';
 import 'package:rmgateway/screens/user_profile.dart';
 import 'package:rmgateway/screens/view_lead.dart';
+import 'package:rmgateway/widgets/side_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'admin_attendance.dart';
@@ -115,6 +116,8 @@ class _ViewLeadState extends State<ViewLead> {
   final List storedocs = [];
   bool search = false;
 
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -147,8 +150,6 @@ class _ViewLeadState extends State<ViewLead> {
         .then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         setState(() {
-          search = false;
-          storedocs.clear();
           totalLeads += 1;
         });
       }
@@ -223,7 +224,7 @@ class _ViewLeadState extends State<ViewLead> {
 
   @override
   Widget build(BuildContext context) {
-    final _modifiedToField = Container(
+    Widget _modifiedToField = Container(
       child: Row(
         children: [
           SizedBox(
@@ -276,7 +277,7 @@ class _ViewLeadState extends State<ViewLead> {
         ],
       ),
     );
-    final _modifiedFromField = Container(
+    Widget _modifiedFromField = Container(
       child: Row(
         children: [
           SizedBox(
@@ -329,7 +330,7 @@ class _ViewLeadState extends State<ViewLead> {
         ],
       ),
     );
-    final _taskToField = Container(
+    Widget _taskToField = Container(
       child: Row(
         children: [
           SizedBox(
@@ -382,7 +383,7 @@ class _ViewLeadState extends State<ViewLead> {
         ],
       ),
     );
-    final _taskFromField = Container(
+    Widget _taskFromField = Container(
       child: Row(
         children: [
           SizedBox(
@@ -435,7 +436,7 @@ class _ViewLeadState extends State<ViewLead> {
         ],
       ),
     );
-    final _dateCreatedField = Container(
+    Widget _dateCreatedField = Container(
       child: Row(
         children: [
           SizedBox(
@@ -488,7 +489,7 @@ class _ViewLeadState extends State<ViewLead> {
         ],
       ),
     );
-    final _visaExpiredField = Container(
+    Widget _visaExpiredField = Container(
       child: Row(
         children: [
           SizedBox(
@@ -877,9 +878,12 @@ class _ViewLeadState extends State<ViewLead> {
               );
             } else {
               if (!search) {
+                storedocs.clear();
                 snapshot.data!.docs.map((DocumentSnapshot document) {
                   Map a = document.data() as Map<String, dynamic>;
+
                   storedocs.add(a);
+
                   a['id'] = document.id;
                 }).toList();
               }
@@ -892,359 +896,358 @@ class _ViewLeadState extends State<ViewLead> {
                         topLeft: Radius.circular(10),
                         topRight: Radius.circular(10))),
                 child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
                     child: Table(
-                      border: TableBorder.all(),
-                      columnWidths: const <int, TableColumnWidth>{
-                        1: FixedColumnWidth(140),
-                      },
-                      defaultVerticalAlignment:
-                          TableCellVerticalAlignment.middle,
-                      children: [
-                        TableRow(children: [
-                          TableCell(
-                            child: Container(
-                              color: Colors.cyan.shade100,
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Date',
-                                    style: TextStyle(
-                                      fontSize: 15.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                  border: TableBorder.all(),
+                  columnWidths: const <int, TableColumnWidth>{
+                    1: FixedColumnWidth(140),
+                  },
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  children: [
+                    TableRow(children: [
+                      TableCell(
+                        child: Container(
+                          color: Colors.cyan.shade100,
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Date',
+                                style: TextStyle(
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      TableCell(
+                        child: Container(
+                          color: Colors.cyan.shade100,
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Name',
+                                style: TextStyle(
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      TableCell(
+                        child: Container(
+                          color: Colors.cyan.shade100,
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'IELTS',
+                                style: TextStyle(
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      TableCell(
+                        child: Container(
+                          color: Colors.cyan.shade100,
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Interested Country',
+                                style: TextStyle(
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      TableCell(
+                        child: Container(
+                          color: Colors.cyan.shade100,
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Phone',
+                                style: TextStyle(
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      TableCell(
+                        child: Container(
+                          color: Colors.cyan.shade100,
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Edit',
+                                style: TextStyle(
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      TableCell(
+                        child: Container(
+                          color: Colors.cyan.shade100,
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Delete',
+                                style: TextStyle(
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
+                    for (var i = 0; i < storedocs.length; i++) ...[
+                      TableRow(children: [
+                        TableCell(
+                          child: Container(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  (storedocs[i]["timeStamp"] != null)
+                                      ? DateFormat('dd-MMM-yyyy').format(
+                                          storedocs[i]["timeStamp"].toDate())
+                                      : "Loading...",
+                                  style: TextStyle(
+                                    fontSize: 12.0,
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                          TableCell(
-                            child: Container(
-                              color: Colors.cyan.shade100,
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                        ),
+                        TableCell(
+                          child: Container(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: InkWell(
+                                  onTap: () {
+                                    FirebaseFirestore.instance
+                                        .collection('leads')
+                                        .get()
+                                        .then((QuerySnapshot querySnapshot) {
+                                      for (var doc in querySnapshot.docs) {
+                                        if (doc["docID"] ==
+                                            storedocs[i]["docID"]) {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      SingleLead(
+                                                        leadModel: doc,
+                                                      )));
+                                        }
+                                      }
+                                    });
+                                  },
                                   child: Text(
-                                    'Name',
+                                    storedocs[i]["firstName"] ?? "empty",
                                     style: TextStyle(
-                                      fontSize: 15.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Container(
-                              color: Colors.cyan.shade100,
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'IELTS',
-                                    style: TextStyle(
-                                      fontSize: 15.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Container(
-                              color: Colors.cyan.shade100,
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Interested Country',
-                                    style: TextStyle(
-                                      fontSize: 15.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Container(
-                              color: Colors.cyan.shade100,
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Phone',
-                                    style: TextStyle(
-                                      fontSize: 15.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Container(
-                              color: Colors.cyan.shade100,
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Edit',
-                                    style: TextStyle(
-                                      fontSize: 15.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Container(
-                              color: Colors.cyan.shade100,
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Delete',
-                                    style: TextStyle(
-                                      fontSize: 15.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ]),
-                        for (var i = 0; i < storedocs.length; i++) ...[
-                          TableRow(children: [
-                            TableCell(
-                              child: Container(
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      (storedocs[i]["timeStamp"] != null)
-                                          ? DateFormat('dd-MMM-yyyy').format(
-                                              storedocs[i]["timeStamp"]
-                                                  .toDate())
-                                          : "Loading...",
-                                      style: TextStyle(
                                         fontSize: 15.0,
-                                      ),
-                                    ),
+                                        color: Colors.cyan.shade900),
                                   ),
                                 ),
                               ),
                             ),
-                            TableCell(
-                              child: Container(
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: InkWell(
-                                      onTap: () {
-                                        FirebaseFirestore.instance
-                                            .collection('leads')
-                                            .get()
-                                            .then(
-                                                (QuerySnapshot querySnapshot) {
-                                          for (var doc in querySnapshot.docs) {
-                                            if (doc["docID"] ==
-                                                storedocs[i]["docID"]) {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          SingleLead(
-                                                            leadModel: doc,
-                                                          )));
-                                            }
-                                          }
-                                        });
-                                      },
-                                      child: Text(
-                                        storedocs[i]["firstName"]??"empty",
-                                        style: TextStyle(
-                                            fontSize: 15.0,
-                                            color: Colors.cyan.shade900),
-                                      ),
-                                    ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  storedocs[i]["ieltsResult"] ?? "empty",
+                                  style: TextStyle(
+                                    fontSize: 15.0,
                                   ),
                                 ),
                               ),
                             ),
-                            TableCell(
-                              child: Container(
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      storedocs[i]["ieltsResult"]??"empty",
-                                      style: TextStyle(
-                                        fontSize: 15.0,
-                                      ),
-                                    ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  storedocs[i]["applyCountry"] ?? "empty",
+                                  style: TextStyle(
+                                    fontSize: 15.0,
                                   ),
                                 ),
                               ),
                             ),
-                            TableCell(
-                              child: Container(
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      storedocs[i]["applyCountry"]??"empty",
-                                      style: TextStyle(
-                                        fontSize: 15.0,
-                                      ),
-                                    ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  storedocs[i]["phone"] ?? "empty",
+                                  style: TextStyle(
+                                    fontSize: 15.0,
                                   ),
                                 ),
                               ),
                             ),
-                            TableCell(
-                              child: Container(
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      storedocs[i]["phone"]??"empty",
-                                      style: TextStyle(
-                                        fontSize: 15.0,
-                                      ),
-                                    ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: IconButton(
+                                  onPressed: () {
+                                    FirebaseFirestore.instance
+                                        .collection('leads')
+                                        .get()
+                                        .then((QuerySnapshot querySnapshot) {
+                                      for (var doc in querySnapshot.docs) {
+                                        if (doc["docID"] ==
+                                            storedocs[i]["docID"]) {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      UpdateLead(
+                                                        leadModel: doc,
+                                                      )));
+                                        }
+                                      }
+                                    });
+                                  },
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: Colors.black,
                                   ),
                                 ),
                               ),
                             ),
-                            TableCell(
-                              child: Container(
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: IconButton(
-                                      onPressed: () {
-                                        FirebaseFirestore.instance
-                                            .collection('leads')
-                                            .get()
-                                            .then(
-                                                (QuerySnapshot querySnapshot) {
-                                          for (var doc in querySnapshot.docs) {
-                                            if (doc["docID"] ==
-                                                storedocs[i]["docID"]) {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          UpdateLead(
-                                                            leadModel: doc,
-                                                          )));
-                                            }
-                                          }
-                                        });
-                                      },
-                                      icon: Icon(
-                                        Icons.edit,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            TableCell(
-                              child: Container(
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: IconButton(
-                                      onPressed: () {
-                                        showDialog(
-                                            context: context,
-                                            builder:
-                                                (BuildContext context) =>
-                                                    AlertDialog(
-                                                      title: Text("Confirm"),
-                                                      content: Text(
-                                                          "Do you want to delete it?"),
-                                                      actions: [
-                                                        IconButton(
-                                                            icon: new Icon(
-                                                                Icons.close),
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            }),
-                                                        IconButton(
-                                                            icon: new Icon(
-                                                                Icons.delete),
-                                                            onPressed: () {
-                                                              FirebaseFirestore
-                                                                  .instance
-                                                                  .collection(
-                                                                      'users')
-                                                                  .get()
-                                                                  .then((QuerySnapshot
-                                                                      querySnapshot) {
-                                                                for (var doc
-                                                                    in querySnapshot
-                                                                        .docs) {
-                                                                  if (doc["userID"].toString() == currentUserID &&doc["userType"]
-                                                                          .toString()
-                                                                          .toLowerCase() ==
-                                                                      "admin") {
-                                                                    FirebaseFirestore
-                                                                        .instance
-                                                                        .collection(
-                                                                            'leads')
-                                                                        .get()
-                                                                        .then((QuerySnapshot
-                                                                            querySnapshot) {
-                                                                      for (var doc
-                                                                          in querySnapshot
-                                                                              .docs) {
-                                                                        if (doc["docID"] ==
-                                                                            storedocs[i]["docID"]) {
-                                                                          setState(
-                                                                              () {
-                                                                            doc.reference.delete();
-                                                                            setState(() {
-                                                                              search = false;
-                                                                              storedocs.clear();
-                                                                            });
-                                                                            Navigator.pop(context);
-                                                                          });
-                                                                        }
-                                                                      }
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) =>
+                                            AlertDialog(
+                                              title: Text("Confirm"),
+                                              content: Text(
+                                                  "Do you want to delete it?"),
+                                              actions: [
+                                                IconButton(
+                                                    icon: new Icon(Icons.close),
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    }),
+                                                IconButton(
+                                                    icon:
+                                                        new Icon(Icons.delete),
+                                                    onPressed: () {
+                                                      FirebaseFirestore.instance
+                                                          .collection('users')
+                                                          .get()
+                                                          .then((QuerySnapshot
+                                                              querySnapshot) {
+                                                        for (var doc
+                                                            in querySnapshot
+                                                                .docs) {
+                                                          if (doc["userID"]
+                                                                      .toString() ==
+                                                                  currentUserID &&
+                                                              doc["userType"]
+                                                                      .toString()
+                                                                      .toLowerCase() ==
+                                                                  "admin") {
+                                                            FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    'leads')
+                                                                .get()
+                                                                .then((QuerySnapshot
+                                                                    querySnapshot) {
+                                                              for (var doc
+                                                                  in querySnapshot
+                                                                      .docs) {
+                                                                if (doc["docID"] ==
+                                                                    storedocs[i]
+                                                                        [
+                                                                        "docID"]) {
+                                                                  setState(() {
+                                                                    doc.reference
+                                                                        .delete();
+                                                                    setState(
+                                                                        () {
+                                                                      search =
+                                                                          false;
+                                                                      storedocs
+                                                                          .clear();
                                                                     });
-                                                                  }
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  });
                                                                 }
-                                                              });
-                                                            })
-                                                      ],
-                                                    ));
-                                      },
-                                      icon: Icon(
-                                        Icons.delete,
-                                        color: Colors.black,
-                                      ),
-                                    ),
+                                                              }
+                                                            });
+                                                          }
+                                                        }
+                                                      });
+                                                    })
+                                              ],
+                                            ));
+                                  },
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: Colors.black,
                                   ),
                                 ),
                               ),
                             ),
-                          ])
-                        ]
-                      ],
-                    )),
+                          ),
+                        ),
+                      ])
+                    ]
+                  ],
+                )),
               );
             }
           });
@@ -1428,88 +1431,441 @@ class _ViewLeadState extends State<ViewLead> {
               title: Center(child: Text("Advance Search")),
               titleTextStyle: TextStyle(fontSize: 20),
               scrollable: true,
-              content: SingleChildScrollView(
-                child: Container(
-                  child: Padding(
-                    padding: const EdgeInsets.all(50.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            assignedDropdown,
-                            _modifiedFromField,
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            applyCountryDropdown,
-                            _modifiedToField,
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            leadSourceDropdown,
-                            _dateCreatedField,
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            currentCountryDropdown,
-                            _taskFromField,
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            weightageDropdown,
-                            _taskToField,
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            intakeYearDropdown,
-                            _visaExpiredField,
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            statusDropdown,
-                          ],
-                        ),
-                        SizedBox(
-                          height: 30,
-                        ),
-                        searchButton
-                      ],
-                    ),
-                  ),
-                ),
+              content:
+               StatefulBuilder(builder: (context, StateSetter setState) {
+                 return SingleChildScrollView(
+                   child: Container(
+                     child: Padding(
+                       padding: const EdgeInsets.all(50.0),
+                       child: Column(
+                         mainAxisAlignment: MainAxisAlignment.center,
+                         crossAxisAlignment: CrossAxisAlignment.center,
+                         children: <Widget>[
+                           Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                             children: [
+                               assignedDropdown,
+                               Container(
+                                 child: Row(
+                                   children: [
+                                     SizedBox(
+                                       width: 50,
+                                     ),
+                                     Text(
+                                       'Modified From   :',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.bold,
+                                         color: Colors.black,
+                                       ),
+                                     ),
+                                     SizedBox(
+                                       width: 25,
+                                     ),
+                                     Material(
+                                       elevation: 5,
+                                       color: Colors.cyan,
+                                       borderRadius: BorderRadius.circular(10),
+                                       child: MaterialButton(
+                                         padding: EdgeInsets.fromLTRB(
+                                           20,
+                                           15,
+                                           20,
+                                           15,
+                                         ),
+                                         minWidth: MediaQuery
+                                             .of(context)
+                                             .size
+                                             .width / 5,
+                                         onPressed: () {
+                                           showDatePicker(
+                                             context: context,
+                                             firstDate: DateTime(1990, 01),
+                                             lastDate: DateTime(2101),
+                                             initialDate: _modifiedFrom ??
+                                                 DateTime.now(),
+                                           ).then((value) {
+                                             setState(() {
+                                               _modifiedFrom = value;
+                                             });
+                                           });
+                                         },
+                                         child: Text(
+                                           (_modifiedFrom == null)
+                                               ? 'Pick Date'
+                                               : DateFormat('yyyy-MM-dd')
+                                               .format(_modifiedFrom!),
+                                           textAlign: TextAlign.center,
+                                           style:
+                                           TextStyle(color: Colors.white,
+                                               fontWeight: FontWeight.bold),
+                                         ),
+                                       ),
+                                     )
+                                   ],
+                                 ),
+                               ),
+                             ],
+                           ),
+                           SizedBox(
+                             height: 20,
+                           ),
+                           Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                             children: [
+                               applyCountryDropdown,
+                               Container(
+                                 child: Row(
+                                   children: [
+                                     SizedBox(
+                                       width: 50,
+                                     ),
+                                     Text(
+                                       'Modified To   :',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.bold,
+                                         color: Colors.black,
+                                       ),
+                                     ),
+                                     SizedBox(
+                                       width: 25,
+                                     ),
+                                     Material(
+                                       elevation: 5,
+                                       color: Colors.cyan,
+                                       borderRadius: BorderRadius.circular(10),
+                                       child: MaterialButton(
+                                         padding: EdgeInsets.fromLTRB(
+                                           20,
+                                           15,
+                                           20,
+                                           15,
+                                         ),
+                                         minWidth: MediaQuery
+                                             .of(context)
+                                             .size
+                                             .width / 5,
+                                         onPressed: () {
+                                           showDatePicker(
+                                             context: context,
+                                             firstDate: DateTime(1990, 01),
+                                             lastDate: DateTime(2101),
+                                             initialDate: _modifiedTo ??
+                                                 DateTime.now(),
+                                           ).then((value) {
+                                             setState(() {
+                                               _modifiedTo = value;
+                                             });
+                                           });
+                                         },
+                                         child: Text(
+                                           (_modifiedTo == null)
+                                               ? 'Pick Date'
+                                               : DateFormat('yyyy-MM-dd')
+                                               .format(_modifiedTo!),
+                                           textAlign: TextAlign.center,
+                                           style:
+                                           TextStyle(color: Colors.white,
+                                               fontWeight: FontWeight.bold),
+                                         ),
+                                       ),
+                                     )
+                                   ],
+                                 ),
+                               ),
+                             ],
+                           ),
+                           SizedBox(
+                             height: 20,
+                           ),
+                           Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                             children: [
+                               leadSourceDropdown,
+                               Container(
+                                 child: Row(
+                                   children: [
+                                     SizedBox(
+                                       width: 50,
+                                     ),
+                                     Text(
+                                       'Date Created   :',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.bold,
+                                         color: Colors.black,
+                                       ),
+                                     ),
+                                     SizedBox(
+                                       width: 25,
+                                     ),
+                                     Material(
+                                       elevation: 5,
+                                       color: Colors.cyan,
+                                       borderRadius: BorderRadius.circular(10),
+                                       child: MaterialButton(
+                                         padding: EdgeInsets.fromLTRB(
+                                           20,
+                                           15,
+                                           20,
+                                           15,
+                                         ),
+                                         minWidth: MediaQuery
+                                             .of(context)
+                                             .size
+                                             .width / 5,
+                                         onPressed: () {
+                                           showDatePicker(
+                                             context: context,
+                                             firstDate: DateTime(1990, 01),
+                                             lastDate: DateTime(2101),
+                                             initialDate: _dateCreated ??
+                                                 DateTime.now(),
+                                           ).then((value) {
+                                             setState(() {
+                                               _dateCreated = value;
+                                             });
+                                           });
+                                         },
+                                         child: Text(
+                                           (_dateCreated == null)
+                                               ? 'Pick Date'
+                                               : DateFormat('yyyy-MM-dd')
+                                               .format(_dateCreated!),
+                                           textAlign: TextAlign.center,
+                                           style:
+                                           TextStyle(color: Colors.white,
+                                               fontWeight: FontWeight.bold),
+                                         ),
+                                       ),
+                                     )
+                                   ],
+                                 ),
+                               ),
+                             ],
+                           ),
+                           SizedBox(
+                             height: 20,
+                           ),
+                           Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                             children: [
+                               currentCountryDropdown,
+                               Container(
+                                 child: Row(
+                                   children: [
+                                     SizedBox(
+                                       width: 50,
+                                     ),
+                                     Text(
+                                       'Task From   :',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.bold,
+                                         color: Colors.black,
+                                       ),
+                                     ),
+                                     SizedBox(
+                                       width: 25,
+                                     ),
+                                     Material(
+                                       elevation: 5,
+                                       color: Colors.cyan,
+                                       borderRadius: BorderRadius.circular(10),
+                                       child: MaterialButton(
+                                         padding: EdgeInsets.fromLTRB(
+                                           20,
+                                           15,
+                                           20,
+                                           15,
+                                         ),
+                                         minWidth: MediaQuery
+                                             .of(context)
+                                             .size
+                                             .width / 5,
+                                         onPressed: () {
+                                           showDatePicker(
+                                             context: context,
+                                             firstDate: DateTime(1990, 01),
+                                             lastDate: DateTime(2101),
+                                             initialDate: _taskFrom ??
+                                                 DateTime.now(),
+                                           ).then((value) {
+                                             setState(() {
+                                               _taskFrom = value;
+                                             });
+                                           });
+                                         },
+                                         child: Text(
+                                           (_taskFrom == null)
+                                               ? 'Pick Date'
+                                               : DateFormat('yyyy-MM-dd')
+                                               .format(_taskFrom!),
+                                           textAlign: TextAlign.center,
+                                           style:
+                                           TextStyle(color: Colors.white,
+                                               fontWeight: FontWeight.bold),
+                                         ),
+                                       ),
+                                     )
+                                   ],
+                                 ),
+                               ),
+                             ],
+                           ),
+                           SizedBox(
+                             height: 20,
+                           ),
+                           Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                             children: [
+                               weightageDropdown,
+                               Container(
+                                 child: Row(
+                                   children: [
+                                     SizedBox(
+                                       width: 50,
+                                     ),
+                                     Text(
+                                       'Task To   :',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.bold,
+                                         color: Colors.black,
+                                       ),
+                                     ),
+                                     SizedBox(
+                                       width: 25,
+                                     ),
+                                     Material(
+                                       elevation: 5,
+                                       color: Colors.cyan,
+                                       borderRadius: BorderRadius.circular(10),
+                                       child: MaterialButton(
+                                         padding: EdgeInsets.fromLTRB(
+                                           20,
+                                           15,
+                                           20,
+                                           15,
+                                         ),
+                                         minWidth: MediaQuery
+                                             .of(context)
+                                             .size
+                                             .width / 5,
+                                         onPressed: () {
+                                           showDatePicker(
+                                             context: context,
+                                             firstDate: DateTime(1990, 01),
+                                             lastDate: DateTime(2101),
+                                             initialDate: _taskTo ??
+                                                 DateTime.now(),
+                                           ).then((value) {
+                                             setState(() {
+                                               _taskTo = value;
+                                             });
+                                           });
+                                         },
+                                         child: Text(
+                                           (_taskTo == null)
+                                               ? 'Pick Date'
+                                               : DateFormat('yyyy-MM-dd')
+                                               .format(_taskTo!),
+                                           textAlign: TextAlign.center,
+                                           style:
+                                           TextStyle(color: Colors.white,
+                                               fontWeight: FontWeight.bold),
+                                         ),
+                                       ),
+                                     )
+                                   ],
+                                 ),
+                               ),
+                             ],
+                           ),
+                           SizedBox(
+                             height: 20,
+                           ),
+                           Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                             children: [
+                               intakeYearDropdown,
+                               Container(
+                                 child: Row(
+                                   children: [
+                                     SizedBox(
+                                       width: 50,
+                                     ),
+                                     Text(
+                                       'Visa Expired   :',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.bold,
+                                         color: Colors.black,
+                                       ),
+                                     ),
+                                     SizedBox(
+                                       width: 25,
+                                     ),
+                                     Material(
+                                       elevation: 5,
+                                       color: Colors.cyan,
+                                       borderRadius: BorderRadius.circular(10),
+                                       child: MaterialButton(
+                                         padding: EdgeInsets.fromLTRB(
+                                           20,
+                                           15,
+                                           20,
+                                           15,
+                                         ),
+                                         minWidth: MediaQuery
+                                             .of(context)
+                                             .size
+                                             .width / 5,
+                                         onPressed: () {
+                                           showDatePicker(
+                                             context: context,
+                                             firstDate: DateTime(1990, 01),
+                                             lastDate: DateTime(2101),
+                                             initialDate: _visaExpired ??
+                                                 DateTime.now(),
+                                           ).then((value) {
+                                             setState(() {
+                                               _visaExpired = value;
+                                             });
+                                           });
+                                         },
+                                         child: Text(
+                                           (_visaExpired == null)
+                                               ? 'Pick Date'
+                                               : DateFormat('yyyy-MM-dd')
+                                               .format(_visaExpired!),
+                                           textAlign: TextAlign.center,
+                                           style:
+                                           TextStyle(color: Colors.white,
+                                               fontWeight: FontWeight.bold),
+                                         ),
+                                       ),
+                                     )
+                                   ],
+                                 ),
+                               ),
+                             ],
+                           ),
+                           SizedBox(
+                             height: 20,
+                           ),
+                           Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                             children: [
+                               statusDropdown,
+                             ],
+                           ),
+                           SizedBox(
+                             height: 30,
+                           ),
+                           searchButton
+                         ],
+                       ),
+                     ),
+                   ),
+                 );
+               }
+
               ),
             ),
           );
@@ -1530,6 +1886,19 @@ class _ViewLeadState extends State<ViewLead> {
           setState(() {
             setState(() {
               search = false;
+              _chosenCountry = null;
+              _chosenCurrentCountry = null;
+              _chosenIntakeYear = null;
+              _chosenLeadSource = null;
+              _chosenUser = null;
+              _chosenStatus = null;
+              _chosenWeightage = null;
+              _dateCreated = null;
+              _taskFrom = null;
+              _taskTo = null;
+              _modifiedFrom = null;
+              _modifiedTo = null;
+              _visaExpired = null;
             });
             storedocs.clear();
           });
@@ -1550,202 +1919,22 @@ class _ViewLeadState extends State<ViewLead> {
     return Scaffold(
       body: Row(
         children: [
-          Container(
-            width: widthDrawer,
-            height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(color: Colors.cyan.shade700),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                        width: 80,
-                        height: 80,
-                        child: CircleAvatar(
-                          backgroundImage: AssetImage(
-                            "assets/images/demo.jpeg",
-                          ),
-                        )),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                    child: dropdownButtonField,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                    child: Divider(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ViewLead()));
-                      },
-                      child: Text(
-                        "Leads",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TodayTask(currentUserName: currentUserName.toString(),)));
-                      },
-                      child: Text(
-                        "Today's Task",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CreateLead()));
-                      },
-                      child: Text(
-                        "Create Lead",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        FirebaseFirestore.instance
-                            .collection('users')
-                            .get()
-                            .then((QuerySnapshot querySnapshot) {
-                          for (var doc in querySnapshot.docs) {
-                            if (doc["userID"].toString() == currentUserID &&doc["userType"].toString().toLowerCase() ==
-                                "admin") {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => EmployeeDetails()));
-                            }
-                          }
-                        });
-                      },
-                      child: Text(
-                        "Employee Details",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        FirebaseFirestore.instance
-                            .collection('users')
-                            .get()
-                            .then((QuerySnapshot querySnapshot) {
-                          for (var doc in querySnapshot.docs) {
-                            if (doc["userID"].toString() == currentUserID &&
-                                doc["userType"].toString().toLowerCase() ==
-                                    "admin") {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AdminAttendance()));
-                            } else if (doc["userID"].toString() ==
-                                currentUserID) {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          Attendance(employeeModel: doc)));
-                            }
-                          }
-                        });
-                      },
-                      child: Text(
-                        "Attendance",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (context) => SendSMS()));
-                      },
-                      child: Text(
-                        "Sms",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SendEmail()));
-                      },
-                      child: Text(
-                        "Email",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (context) => Apply()));
-                      },
-                      child: Text(
-                        "Apply",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  propertyField
-                ],
-              ),
-            ),
-          ),
+          SideWidget(),
           Expanded(
-            child: Stack(
-              children:<Widget>[
-
-                Center(
-                  child: Container(
-              width: MediaQuery.of(context).size.width/2,
-              height: MediaQuery.of(context).size.height/2,
-              decoration: BoxDecoration(
-                  image: DecorationImage(image: AssetImage("assets/images/demo.jpeg"), fit: BoxFit.cover,opacity: 0.09),
-              ),
-            ),
+            child: Stack(children: <Widget>[
+              Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width / 2,
+                  height: MediaQuery.of(context).size.height / 2,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage("assets/images/demo.jpeg"),
+                        fit: BoxFit.cover,
+                        opacity: 0.09),
+                  ),
                 ),
-
-
-                Container(
+              ),
+              Container(
                 width: widthMain,
                 height: MediaQuery.of(context).size.height,
                 child: SingleChildScrollView(
@@ -1798,8 +1987,7 @@ class _ViewLeadState extends State<ViewLead> {
                   ],
                 )),
               ),
-            ]
-            ),
+            ]),
           ),
         ],
       ),
@@ -1840,7 +2028,6 @@ class _ViewLeadState extends State<ViewLead> {
       storedocs.clear();
     });
 
-
     if (_chosenUser != null &&
         _chosenStatus != null &&
         _chosenCountry != null &&
@@ -1849,21 +2036,16 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedFrom != null &&
         _modifiedTo != null) {
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase()) &&
-            doc["originCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCurrentCountry.toString().toLowerCase()) &&
-            doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase()) &&
+            doc["originCountry"].toString().toLowerCase() ==
+                (_chosenCurrentCountry.toString().toLowerCase()) &&
+            doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -1879,24 +2061,17 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenCurrentCountry != null &&
         _chosenWeightage != null &&
         _modifiedFrom != null) {
-
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase()) &&
-            doc["originCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCurrentCountry.toString().toLowerCase()) &&
-            doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase()) &&
+            doc["originCountry"].toString().toLowerCase() ==
+                (_chosenCurrentCountry.toString().toLowerCase()) &&
+            doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!))) {
@@ -1908,23 +2083,17 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenCountry != null &&
         _chosenCurrentCountry != null &&
         _chosenWeightage != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase()) &&
-            doc["originCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCurrentCountry.toString().toLowerCase()) &&
-            doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase())) {
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase()) &&
+            doc["originCountry"].toString().toLowerCase() ==
+                (_chosenCurrentCountry.toString().toLowerCase()) &&
+            doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase())) {
           storedocs.add(doc);
         }
       }
@@ -1932,58 +2101,41 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenStatus != null &&
         _chosenCountry != null &&
         _chosenCurrentCountry != null) {
-
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase()) &&
-            doc["originCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCurrentCountry.toString().toLowerCase())) {
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase()) &&
+            doc["originCountry"].toString().toLowerCase() ==
+                (_chosenCurrentCountry.toString().toLowerCase())) {
           storedocs.add(doc);
         }
       }
     } else if (_chosenUser != null &&
         _chosenStatus != null &&
         _chosenCountry != null) {
-
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase())) {
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase())) {
           storedocs.add(doc);
         }
       }
     } else if (_chosenUser != null && _chosenStatus != null) {
-
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase())) {
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase())) {
           storedocs.add(doc);
         }
       }
     } else if (_chosenUser != null) {
-
-
       for (var doc in documents.docs) {
         if (doc["assigned"]
             .toString()
@@ -1998,20 +2150,15 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenWeightage != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase()) &&
-            doc["originCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCurrentCountry.toString().toLowerCase()) &&
-            doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase()) &&
+        if (doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase()) &&
+            doc["originCountry"].toString().toLowerCase() ==
+                (_chosenCurrentCountry.toString().toLowerCase()) &&
+            doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2026,17 +2173,13 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenWeightage != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase()) &&
-            doc["originCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCurrentCountry.toString().toLowerCase()) &&
-            doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase()) &&
+        if (doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase()) &&
+            doc["originCountry"].toString().toLowerCase() ==
+                (_chosenCurrentCountry.toString().toLowerCase()) &&
+            doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2050,14 +2193,11 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenWeightage != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["originCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCurrentCountry.toString().toLowerCase()) &&
-            doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase()) &&
+        if (doc["originCountry"].toString().toLowerCase() ==
+                (_chosenCurrentCountry.toString().toLowerCase()) &&
+            doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2070,11 +2210,9 @@ class _ViewLeadState extends State<ViewLead> {
     } else if (_chosenWeightage != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase()) &&
+        if (doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2085,7 +2223,6 @@ class _ViewLeadState extends State<ViewLead> {
         }
       }
     } else if (_modifiedFrom != null && _modifiedTo != null) {
-
       for (var doc in documents.docs) {
         if (int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
@@ -2097,7 +2234,6 @@ class _ViewLeadState extends State<ViewLead> {
         }
       }
     } else if (_modifiedTo != null) {
-
       for (var doc in documents.docs) {
         if (int.parse(
                 DateFormat('yyyyMMdd').format(doc["modifiedDate"].toDate())) <=
@@ -2111,23 +2247,17 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenCurrentCountry != null &&
         _chosenWeightage != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase()) &&
-            doc["originCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCurrentCountry.toString().toLowerCase()) &&
-            doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase()) &&
+            doc["originCountry"].toString().toLowerCase() ==
+                (_chosenCurrentCountry.toString().toLowerCase()) &&
+            doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
@@ -2139,20 +2269,15 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenCountry != null &&
         _chosenCurrentCountry != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase()) &&
-            doc["originCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCurrentCountry.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase()) &&
+            doc["originCountry"].toString().toLowerCase() ==
+                (_chosenCurrentCountry.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
@@ -2163,17 +2288,13 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenStatus != null &&
         _chosenCountry != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
@@ -2183,14 +2304,11 @@ class _ViewLeadState extends State<ViewLead> {
     } else if (_chosenUser != null &&
         _chosenStatus != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
@@ -2198,11 +2316,9 @@ class _ViewLeadState extends State<ViewLead> {
         }
       }
     } else if (_chosenUser != null && _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
@@ -2215,20 +2331,15 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenCurrentCountry != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase()) &&
-            doc["originCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCurrentCountry.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase()) &&
+            doc["originCountry"].toString().toLowerCase() ==
+                (_chosenCurrentCountry.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2243,17 +2354,13 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenCountry != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2267,14 +2374,11 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenStatus != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2287,11 +2391,9 @@ class _ViewLeadState extends State<ViewLead> {
     } else if (_chosenUser != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2307,20 +2409,15 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenWeightage != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase()) &&
-            doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase()) &&
+            doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2335,17 +2432,13 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenWeightage != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2359,14 +2452,11 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenWeightage != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2382,20 +2472,15 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenWeightage != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["status"]
-                 .toString()
-                .toLowerCase() ==(_chosenStatus.toString().toLowerCase()) &&
-            doc["originCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCurrentCountry.toString().toLowerCase()) &&
-            doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["status"].toString().toLowerCase() ==
+                (_chosenStatus.toString().toLowerCase()) &&
+            doc["originCountry"].toString().toLowerCase() ==
+                (_chosenCurrentCountry.toString().toLowerCase()) &&
+            doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2410,17 +2495,13 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenWeightage != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["originCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCurrentCountry.toString().toLowerCase()) &&
-            doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["originCountry"].toString().toLowerCase() ==
+                (_chosenCurrentCountry.toString().toLowerCase()) &&
+            doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2436,20 +2517,15 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenWeightage != null &&
         _modifiedFrom != null &&
         _modifiedTo != null) {
-
       for (var doc in documents.docs) {
-        if (doc["assigned"]
-                 .toString()
-                .toLowerCase() ==(_chosenUser.toString().toLowerCase()) &&
-            doc["applyCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCountry.toString().toLowerCase()) &&
-            doc["originCountry"]
-                 .toString()
-                .toLowerCase() ==(_chosenCurrentCountry.toString().toLowerCase()) &&
-            doc["weightage"]
-                 .toString()
-                .toLowerCase() ==(_chosenWeightage.toString().toLowerCase()) &&
+        if (doc["assigned"].toString().toLowerCase() ==
+                (_chosenUser.toString().toLowerCase()) &&
+            doc["applyCountry"].toString().toLowerCase() ==
+                (_chosenCountry.toString().toLowerCase()) &&
+            doc["originCountry"].toString().toLowerCase() ==
+                (_chosenCurrentCountry.toString().toLowerCase()) &&
+            doc["weightage"].toString().toLowerCase() ==
+                (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
                     .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
@@ -2460,7 +2536,6 @@ class _ViewLeadState extends State<ViewLead> {
         }
       }
     } else if (_chosenLeadSource != null) {
-
       for (var doc in documents.docs) {
         if (doc["leadSource"]
             .toString()
@@ -2470,14 +2545,12 @@ class _ViewLeadState extends State<ViewLead> {
         }
       }
     } else if (_chosenIntakeYear != null) {
-
       for (var doc in documents.docs) {
         if (doc["intakeYearApplied"].contains(_chosenIntakeYear)) {
           storedocs.add(doc);
         }
       }
     } else if (_dateCreated != null) {
-
       for (var doc in documents.docs) {
         if (DateFormat('yyyyMMdd')
             .format(doc["timeStamp"].toDate())
@@ -2486,7 +2559,6 @@ class _ViewLeadState extends State<ViewLead> {
         }
       }
     } else if (_visaExpired != null) {
-
       for (var doc in documents.docs) {
         if (doc["visaExpired"]
             .contains(DateFormat('yyyyMMdd').format(_visaExpired!))) {
@@ -2494,7 +2566,6 @@ class _ViewLeadState extends State<ViewLead> {
         }
       }
     } else if (_taskFrom != null) {
-
       for (var doc in documents.docs) {
         if (int.parse(doc["taskDueDate"]) >=
             int.parse(DateFormat('yyyyMMdd').format(_taskFrom!))) {
@@ -2502,14 +2573,61 @@ class _ViewLeadState extends State<ViewLead> {
         }
       }
     } else if (_taskTo != null) {
-
       for (var doc in documents.docs) {
         if (int.parse(doc["taskDueDate"]) <=
             int.parse(DateFormat('yyyyMMdd').format(_taskTo!))) {
           storedocs.add(doc);
         }
       }
-    } else {
+    }
+    else if (_modifiedFrom != null) {
+      for (var doc in documents.docs) {
+        if (int.parse(doc["modifiedDate"]) >=
+            int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!))) {
+          storedocs.add(doc);
+        }
+      }
+    }
+    else if (_chosenStatus != null) {
+      for (var doc in documents.docs) {
+        if (doc["status"]
+            .toString()
+            .toLowerCase()
+            .contains(_chosenStatus.toString().toLowerCase())) {
+          storedocs.add(doc);
+        }
+      }
+    }
+    else if (_chosenWeightage != null) {
+      for (var doc in documents.docs) {
+        if (doc["weightage"]
+            .toString()
+            .toLowerCase()
+            .contains(_chosenWeightage.toString().toLowerCase())) {
+          storedocs.add(doc);
+        }
+      }
+    }
+    else if (_chosenCurrentCountry != null) {
+      for (var doc in documents.docs) {
+        if (doc["originCountry"]
+            .toString()
+            .toLowerCase()
+            .contains(_chosenCurrentCountry.toString().toLowerCase())) {
+          storedocs.add(doc);
+        }
+      }
+    }
+    else if (_chosenCountry != null) {
+      for (var doc in documents.docs) {
+        if (doc["applyCountry"]
+            .toString()
+            .toLowerCase()
+            .contains(_chosenCountry.toString().toLowerCase())) {
+          storedocs.add(doc);
+        }
+      }
+    }else {
       setState(() {
         search = false;
       });

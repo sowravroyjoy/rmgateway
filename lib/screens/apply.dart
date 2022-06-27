@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:rmgateway/model/apply_model.dart';
 import 'package:rmgateway/screens/view_lead.dart';
 
 class Apply extends StatefulWidget {
@@ -35,10 +37,14 @@ class _ApplyState extends State<Apply> {
     _process = false;
     _count = 1;
   }
+
   @override
   Widget build(BuildContext context) {
     final nameField = Container(
-        width: MediaQuery.of(context).size.width / 3,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width / 3,
         child: TextFormField(
             cursorColor: Colors.cyan.shade100,
             autofocus: false,
@@ -73,10 +79,15 @@ class _ApplyState extends State<Apply> {
               ),
             )));
     final contactField = Container(
-        width: MediaQuery.of(context).size.width / 3,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width / 3,
         child: TextFormField(
             cursorColor: Colors.cyan.shade100,
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'(^\d*\.?\d*)'))],
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'(^\d*\.?\d*)'))
+            ],
             autofocus: false,
             controller: contactEditingController,
             keyboardType: TextInputType.number,
@@ -109,7 +120,10 @@ class _ApplyState extends State<Apply> {
               ),
             )));
     final emailField = Container(
-        width: MediaQuery.of(context).size.width / 3,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width / 3,
         child: TextFormField(
             cursorColor: Colors.cyan.shade100,
             autofocus: false,
@@ -145,7 +159,10 @@ class _ApplyState extends State<Apply> {
             )));
 
     final countryField = Container(
-        width: MediaQuery.of(context).size.width / 3,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width / 3,
         child: TextFormField(
             cursorColor: Colors.cyan.shade100,
             autofocus: false,
@@ -181,7 +198,10 @@ class _ApplyState extends State<Apply> {
             )));
 
     final interestedCountryField = Container(
-        width: MediaQuery.of(context).size.width / 3,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width / 3,
         child: TextFormField(
             cursorColor: Colors.cyan.shade100,
             autofocus: false,
@@ -217,7 +237,7 @@ class _ApplyState extends State<Apply> {
             )));
 
 
-    final createButton =  Material(
+    final createButton = Material(
       elevation: (_process!) ? 0 : 5,
       color: (_process!) ? Colors.green.shade800 : Colors.green,
       borderRadius: BorderRadius.circular(10),
@@ -274,16 +294,19 @@ class _ApplyState extends State<Apply> {
     );
 
 
-
-    DropdownMenuItem<String> buildMenuIelts(String item) => DropdownMenuItem(
-        value: item,
-        child: Text(
-          item,
-          style: TextStyle(color: Colors.black),
-        ));
+    DropdownMenuItem<String> buildMenuIelts(String item) =>
+        DropdownMenuItem(
+            value: item,
+            child: Text(
+              item,
+              style: TextStyle(color: Colors.black),
+            ));
 
     final ieltsDropdown = Container(
-        width: MediaQuery.of(context).size.width / 3,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width / 3,
         child: DropdownButtonFormField<String>(
             decoration: InputDecoration(
               contentPadding: EdgeInsets.fromLTRB(
@@ -313,16 +336,19 @@ class _ApplyState extends State<Apply> {
             }));
 
 
-
-    DropdownMenuItem<String> buildMenuTitle(String item) => DropdownMenuItem(
-        value: item,
-        child: Text(
-          item,
-          style: TextStyle(color: Colors.black),
-        ));
+    DropdownMenuItem<String> buildMenuTitle(String item) =>
+        DropdownMenuItem(
+            value: item,
+            child: Text(
+              item,
+              style: TextStyle(color: Colors.black),
+            ));
 
     final titleDropdown = Container(
-        width: MediaQuery.of(context).size.width / 3,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width / 3,
         child: DropdownButtonFormField<String>(
             decoration: InputDecoration(
               contentPadding: EdgeInsets.fromLTRB(
@@ -353,7 +379,7 @@ class _ApplyState extends State<Apply> {
 
 
     final backButton = TextButton(
-        onPressed: (){
+        onPressed: () {
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => ViewLead()));
         },
@@ -369,10 +395,12 @@ class _ApplyState extends State<Apply> {
       backgroundColor: Colors.grey.shade700,
       body: AlertDialog(
         backgroundColor: Colors.cyan.shade100,
-        title: Center(child: Text("Please Give Your Information\n         To Get Best Services" , style: TextStyle(fontSize: 30),)),
+        title: Center(child: Text(
+          "Please Give Your Information\n         To Get Best Services",
+          style: TextStyle(fontSize: 30),)),
         titleTextStyle: TextStyle(fontSize: 20),
         scrollable: true,
-        content:SingleChildScrollView(
+        content: SingleChildScrollView(
           child: Container(
             child: Padding(
               padding: const EdgeInsets.all(50.0),
@@ -398,7 +426,7 @@ class _ApplyState extends State<Apply> {
                     SizedBox(height: 30,),
                     createButton,
                     SizedBox(height: 20,),
-                    backButton,
+                    // backButton,
                     SizedBox(height: 40,),
 
                   ],
@@ -412,7 +440,54 @@ class _ApplyState extends State<Apply> {
   }
 
 
-  void AddData(){
+  void AddData() {
+    if (_formKey.currentState!.validate() && _chosenIelts != null &&
+        _chosenTitle != null) {
+      final ref = FirebaseFirestore.instance.collection("apply").doc();
 
+      ApplyModel applyModel = ApplyModel();
+      applyModel.timeStamp = FieldValue.serverTimestamp();
+      applyModel.title = _chosenTitle;
+      applyModel.name = nameEditingController.text;
+      applyModel.contact = contactEditingController.text;
+      applyModel.email = emailEditingController.text;
+      applyModel.ielts = _chosenIelts;
+      applyModel.country = countryEditingController.text;
+      applyModel.interestedCountry = interestedCountryEditingController.text;
+      applyModel.docID = ref.id;
+      ref.set(applyModel.toMap()).whenComplete(() {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.green,
+            content: Text("Your application sent successfully!!")));
+
+
+        setState(() {
+          _chosenTitle = null;
+          nameEditingController.clear();
+          contactEditingController.clear();
+          emailEditingController.clear();
+          _chosenIelts = null;
+          countryEditingController.clear();
+          interestedCountryEditingController.clear();
+          _process = false;
+          _count = 1;
+        });
+      }).onError((error, stackTrace) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("Application failed!!")));
+        setState(() {
+          _process = false;
+          _count = 1;
+        });
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red, content: Text("Something is wrong!!")));
+      setState(() {
+        _process = false;
+        _count = 1;
+      });
+    }
   }
 }

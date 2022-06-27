@@ -36,6 +36,7 @@ import 'package:rmgateway/screens/user_profile.dart';
 import 'package:rmgateway/screens/view_lead.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../widgets/side_widget.dart';
 import 'admin_attendance.dart';
 import 'create_lead.dart';
 import 'create_student_type.dart';
@@ -188,6 +189,7 @@ class _TodayTaskState extends State<TodayTask> {
               );
             } else {
 
+              storedocs.clear();
               snapshot.data!.docs.where((element) => element["assigned"].toString().toLowerCase()==widget.currentUserName.toString().toLowerCase() &&  element["taskStatus"].toString().toLowerCase() == "pending")
                   .map((DocumentSnapshot document) {
                 Map a = document.data() as Map<String, dynamic>;
@@ -568,186 +570,7 @@ class _TodayTaskState extends State<TodayTask> {
     return Scaffold(
       body: Row(
         children: [
-          Container(
-            width: widthDrawer,
-            height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(color: Colors.cyan.shade700),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                        width: 80,
-                        height: 80,
-                        child: CircleAvatar(
-                          backgroundImage: AssetImage(
-                            "assets/images/demo.jpeg",
-                          ),
-                        )),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                    child: dropdownButtonField,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                    child: Divider(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ViewLead()));
-                      },
-                      child: Text(
-                        "Leads",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TodayTask(currentUserName: currentUserName.toString(),)));
-                      },
-                      child: Text(
-                        "Today's Task",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CreateLead()));
-                      },
-                      child: Text(
-                        "Create Lead",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        FirebaseFirestore.instance
-                            .collection('users')
-                            .get()
-                            .then((QuerySnapshot querySnapshot) {
-                          for (var doc in querySnapshot.docs) {
-                            if (doc["userID"].toString() == currentUserID &&doc["userType"].toString().toLowerCase() ==
-                                "admin") {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => EmployeeDetails()));
-                            }
-                          }
-                        });
-                      },
-                      child: Text(
-                        "Employee Details",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        FirebaseFirestore.instance
-                            .collection('users')
-                            .get()
-                            .then((QuerySnapshot querySnapshot) {
-                          for (var doc in querySnapshot.docs) {
-                            if (doc["userID"].toString() == currentUserID &&
-                                doc["userType"].toString().toLowerCase() ==
-                                    "admin") {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AdminAttendance()));
-                            } else if (doc["userID"].toString() ==
-                                currentUserID) {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          Attendance(employeeModel: doc)));
-                            }
-                          }
-                        });
-                      },
-                      child: Text(
-                        "Attendance",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (context) => SendSMS()));
-                      },
-                      child: Text(
-                        "Sms",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SendEmail()));
-                      },
-                      child: Text(
-                        "Email",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (context) => Apply()));
-                      },
-                      child: Text(
-                        "Apply",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  propertyField
-                ],
-              ),
-            ),
-          ),
+          SideWidget(),
           Expanded(
             child: Stack(
               children: [

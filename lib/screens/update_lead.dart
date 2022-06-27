@@ -32,6 +32,7 @@ import 'package:rmgateway/screens/update_student_type.dart';
 import 'package:rmgateway/screens/update_university.dart';
 import 'package:rmgateway/screens/user_profile.dart';
 import 'package:rmgateway/screens/view_lead.dart';
+import 'package:rmgateway/widgets/side_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'admin_attendance.dart';
@@ -86,19 +87,25 @@ class _UpdateLeadState extends State<UpdateLead> {
   // List of items in our dropdown menu
   List<String> properties = ["Add Country", "Add University", "Add Course Level", "Add Lead Source","Add Status","Add Student Type","Add Weightage"];
 
-  final List<String> _studentTypes = [];
+  final List<String> _studentTypes = ["none"];
   String? _chosenStudentType;
 
-  final List<String> _applyCountryTypes = [];
+  final List<String> _applyCountryTypes = ["none"];
   String? _chosenApplyCountry;
 
-  final List<String> _courseLevelTypes = [];
+  final List<String> _courseLevelTypes = ["none"];
   String? _chosenCourseLevel;
 
-  final List<String> _courseTitleTypes = [];
+  final List<String> _courseTitleTypes = ["none"];
   String? _chosenCourseTitle;
 
   final List<String> _intakeYears = [
+    "none",
+    "2017",
+    "2018",
+    "2019",
+    "2020",
+    "2021",
     "2022",
     "2023",
     "2024",
@@ -112,6 +119,7 @@ class _UpdateLeadState extends State<UpdateLead> {
   String? _chosenIntakeYear;
 
   final List<String> _intakeMonths = [
+    "none",
     "January",
     "February",
     "March",
@@ -129,6 +137,12 @@ class _UpdateLeadState extends State<UpdateLead> {
 
 
   final List<String> _intakeYearsApplied = [
+    "none",
+    "2017",
+    "2018",
+    "2019",
+    "2020",
+    "2021",
     "2022",
     "2023",
     "2024",
@@ -142,6 +156,7 @@ class _UpdateLeadState extends State<UpdateLead> {
   String? _chosenIntakeYearApplied;
 
   final List<String> _intakeMonthsApplied = [
+    "none",
     "January",
     "February",
     "March",
@@ -158,6 +173,7 @@ class _UpdateLeadState extends State<UpdateLead> {
   String? _chosenIntakeMonthApplied;
 
   final List<String> _preQLevels = [
+    "none",
     "Level 1",
     "Level 2",
     "Level 3",
@@ -170,6 +186,7 @@ class _UpdateLeadState extends State<UpdateLead> {
   String? _chosenPreQLevel;
 
   final List<String> _recQLevels = [
+    "none",
     "Level 1",
     "Level 2",
     "Level 3",
@@ -181,35 +198,35 @@ class _UpdateLeadState extends State<UpdateLead> {
   ];
   String? _chosenRecQLevel;
 
-  final List<String> _ielts = ["Intended Date", "Yes", "No"];
+  final List<String> _ielts = [    "none","Intended Date", "Yes", "No"];
   String? _chosenIelts;
 
-  final List<String> _firstChoices = [];
+  final List<String> _firstChoices = [    "none",];
   String? _chosenFirstChoice;
 
-  final List<String> _secondChoices = [];
+  final List<String> _secondChoices = [    "none",];
   String? _chosenSecondChoice;
 
-  final List<String> _thirdChoices = [];
+  final List<String> _thirdChoices = [    "none",];
   String? _chosenThirdChoice;
 
-  final List<String> _fourthChoices = [];
+  final List<String> _fourthChoices = [    "none",];
   String? _chosenFourthChoice;
 
-  final List<String> _status = [];
+  final List<String> _status = [    "none",];
   String? _chosenStatus;
 
-  final List<String> _leadSource = [];
+  final List<String> _leadSource = [    "none",];
   String? _chosenLeadSource;
 
-  final List<String> _weightages = [];
+  final List<String> _weightages = [    "none",];
   String? _chosenWeightage;
 
-  final List<String> _universities = [];
+  final List<String> _universities = [    "none",];
   String? _chosenUniversity;
 
 
-  final List<String> _assigned = [];
+  final List<String> _assigned = [    "none",];
   String? _chosenAssigned;
 
   DateTime? _visaIssued;
@@ -1879,6 +1896,37 @@ class _UpdateLeadState extends State<UpdateLead> {
             onChanged: (newValue) {
               setState(() {
                 _chosenApplyCountry = newValue;
+                if(newValue != "none"){
+                  FirebaseFirestore.instance
+                      .collection('universities')
+                      .get()
+                      .then((QuerySnapshot querySnapshot) {
+                    for (var doc in querySnapshot.docs) {
+                      if(doc["address"].toString().toLowerCase() == _chosenApplyCountry.toString().toLowerCase()){
+                        setState(() {
+                          _universities.add(doc["name"]);
+                          _firstChoices.add(doc["name"]);
+                          _secondChoices.add(doc["name"]);
+                          _thirdChoices.add(doc["name"]);
+                          _fourthChoices.add(doc["name"]);
+                        });
+                      }
+                    }
+                  });
+                }else{
+                  setState((){
+                    _universities.clear();
+                    _firstChoices.clear();
+                    _secondChoices.clear();
+                    _thirdChoices.clear();
+                    _fourthChoices.clear();
+                    _universities.add("none");
+                    _firstChoices.add("none");
+                    _secondChoices.add("none");
+                    _thirdChoices.add("none");
+                    _fourthChoices.add("none");
+                  });
+                }
               });
             }));
 
@@ -2902,181 +2950,7 @@ class _UpdateLeadState extends State<UpdateLead> {
     return Scaffold(
       body: Row(
         children: [
-          Container(
-            width: widthDrawer,
-            height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(color: Colors.cyan.shade700),
-            child:Scrollbar(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                        width: 80,
-                        height: 80,
-                        child: CircleAvatar(
-                          backgroundImage: AssetImage(
-                            "assets/images/demo.jpeg",
-                          ),
-                        )
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8,0,8,0),
-                    child: dropdownButtonField,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8,0,8,0),
-                    child: Divider(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  SizedBox(height: 10,),
-                  TextButton(
-                      onPressed: (){
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => ViewLead()));
-                      },
-                      child: Text(
-                        "Leads",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold
-                        ),
-                      )
-                  ),
-                  SizedBox(height: 20,),
-                  TextButton(
-                      onPressed: (){
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => TodayTask(currentUserName: currentUserName.toString()
-                          ,)));
-                      },
-                      child: Text(
-                        "Today's Task",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold
-                        ),
-                      )
-                  ),
-                  SizedBox(height: 20,),
-                  TextButton(
-                      onPressed: (){
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => CreateLead()));
-                      },
-                      child: Text(
-                        "Create Lead",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold
-                        ),
-                      )
-                  ),
-                  SizedBox(height: 20,),
-                  TextButton(
-                      onPressed: (){
-                        FirebaseFirestore.instance
-                            .collection('users')
-                            .get()
-                            .then((QuerySnapshot querySnapshot) {
-                          for (var doc in querySnapshot.docs) {
-                            if ( doc["userID"].toString() == currentUserID &&doc["userType"].toString().toLowerCase() == "admin" ) {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          EmployeeDetails()));
-                            }
-                          }
-                        });
-                      },
-                      child: Text(
-                        "Employee Details",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold
-                        ),
-                      )
-                  ),
-                  SizedBox(height: 20,),
-                  TextButton(
-                      onPressed: (){
-                        FirebaseFirestore.instance
-                            .collection('users')
-                            .get()
-                            .then((QuerySnapshot querySnapshot) {
-                          for (var doc in querySnapshot.docs) {
-                            if (doc["userID"].toString().toLowerCase() ==
-                                currentUserID &&
-                                doc["userType"].toString().toLowerCase() == "admin") {
-                              Navigator.pushReplacement(
-                                  context, MaterialPageRoute(builder: (context) => AdminAttendance()));
-                            } else if (doc["userID"].toString().toLowerCase() ==
-                                currentUserID) {
-                              Navigator.pushReplacement(
-                                  context, MaterialPageRoute(builder: (context) => Attendance(employeeModel: doc)));
-                            }
-                          }
-                        });
-                      },
-                      child: Text(
-                        "Attendance",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold
-                        ),
-                      )
-                  ),
-                  SizedBox(height: 20,),
-                  TextButton(
-                      onPressed: (){
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => SendSMS()));
-                      },
-                      child: Text(
-                        "Sms",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold
-                        ),
-                      )
-                  ),
-                  SizedBox(height: 20,),
-                  TextButton(
-                      onPressed: (){
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => SendEmail()));
-                      },
-                      child: Text(
-                        "Email",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold
-                        ),
-                      )
-                  ),
-                  SizedBox(height: 20,),
-                  TextButton(
-                      onPressed: (){
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => Apply()));
-                      },
-                      child: Text(
-                        "Apply",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold
-                        ),
-                      )
-                  ),
-                  SizedBox(height: 10,),
-                  propertyField
-                ],
-              ),
-            ),
-          ),
+          SideWidget(),
           Expanded(
             child: Stack(
               children: [

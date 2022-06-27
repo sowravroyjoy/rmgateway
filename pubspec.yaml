@@ -44,6 +44,7 @@ dependencies:
   twilio_flutter: ^0.0.9
   http: ^0.13.4
   shared_preferences: ^2.0.15
+  url_strategy: ^0.2.0
 
 dev_dependencies:
   flutter_test:
