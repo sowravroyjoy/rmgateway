@@ -159,10 +159,17 @@ class _SingleLeadState extends State<SingleLead> {
                   anchorElement.download = value;
                   anchorElement.click();
                 },
-                child: Text(
-                  value.toString(),
-                  overflow: TextOverflow.ellipsis,
-                ),
+                child: Flexible(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Container(
+                      child: Text(
+                        value.toString(),
+                        style: TextStyle(),
+                      ),
+                    ),
+                  ),
+                )
               )
             ],
           ),

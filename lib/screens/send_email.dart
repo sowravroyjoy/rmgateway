@@ -4,7 +4,10 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_sms/flutter_sms.dart';
+import 'package:html_editor_enhanced/html_editor.dart';
+import 'package:html_editor_enhanced/utils/options.dart';
 import 'package:rmgateway/model/country_model.dart';
 import 'package:rmgateway/model/student_type_model.dart';
 import 'package:rmgateway/model/university_model.dart';
@@ -14,6 +17,7 @@ import 'package:rmgateway/screens/update_university.dart';
 import 'package:rmgateway/screens/view_lead.dart';
 import 'package:twilio_flutter/twilio_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:zefyrka/zefyrka.dart';
 
 class SendEmail extends StatefulWidget {
   final String? singleEmail;
@@ -27,9 +31,13 @@ class _SendEmailState extends State<SendEmail> {
   final _formKey = GlobalKey<FormState>();
   final emailEditingController = new TextEditingController();
   final subjectEditingController = new TextEditingController();
+
+  HtmlEditorController controller = HtmlEditorController();
+  ZefyrController _controller = ZefyrController();
   List<String> emailList = [];
   bool? _process;
   int? _count;
+
 
   @override
   void initState() {
@@ -69,7 +77,7 @@ class _SendEmailState extends State<SendEmail> {
                 20,
                 15,
               ),
-              labelText: 'Write your email',
+              labelText: 'Write your message',
               labelStyle: TextStyle(color: Colors.black),
               floatingLabelStyle: TextStyle(color: Colors.blue),
               border: OutlineInputBorder(
@@ -187,6 +195,50 @@ class _SendEmailState extends State<SendEmail> {
               color: Colors.blue.shade800
           ),
         )
+    );
+
+
+    final eTextField = Container(
+      width: MediaQuery.of(context).size.width/3,
+      height: 400,
+      child: HtmlEditor(
+        controller: controller,
+        htmlToolbarOptions: HtmlToolbarOptions(
+
+        ),//required
+        htmlEditorOptions: HtmlEditorOptions(
+          hint: "Your text here...",
+          //initalText: "text content initial, if any",
+        ),
+        otherOptions: OtherOptions(
+          height: 400,
+        ),
+      ),
+    );
+
+
+    final zText = Container(
+        width: MediaQuery.of(context).size.width/3,
+      child: Column(
+        children: [
+          ZefyrToolbar.basic(
+              controller: _controller,
+          ),
+           Container(
+             padding: EdgeInsets.all(10),
+             decoration: BoxDecoration(
+               color: Colors.white,
+               borderRadius: BorderRadius.circular(10)
+             ),
+             child: ZefyrEditor(
+                maxHeight: 500,
+                minHeight: 100,
+                controller: _controller,
+              ),
+           ),
+
+        ],
+      )
     );
 
     final CollectionReference _collectionReference =
@@ -356,7 +408,6 @@ class _SendEmailState extends State<SendEmail> {
           });
     }
 
-
     return Scaffold(
       backgroundColor: Colors.grey.shade700,
       body: AlertDialog(
@@ -376,7 +427,7 @@ class _SendEmailState extends State<SendEmail> {
                   children: <Widget>[
                     subjectField,
                     SizedBox(height: 10,),
-                    emailField,
+                    zText,
                     SizedBox(height: 30,),
                     createButton,
                     SizedBox(height: 10,),
@@ -398,7 +449,8 @@ class _SendEmailState extends State<SendEmail> {
 
 
   void _sendEmail() async {
-    if(subjectEditingController.text.isEmpty && emailEditingController.text.isEmpty){
+
+    if(subjectEditingController.text.isEmpty && _controller.document.toPlainText().isEmpty){
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Colors.red, content: Text("At Least 1 Person or Message Required")));
       setState(() {
@@ -419,7 +471,7 @@ class _SendEmailState extends State<SendEmail> {
                 "template_params": {
                   "subject" : subjectEditingController.text,
                   "name" : "Sumit",
-                  "message" : emailEditingController.text,
+                  "message" : _controller.document.toPlainText(),
                   "user_email" : email
                 }
               }));

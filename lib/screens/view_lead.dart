@@ -96,27 +96,15 @@ class _ViewLeadState extends State<ViewLead> {
   // Initial Selected Value
   String userName = 'Unknown';
 
-  // List of items in our dropdown menu
-  List<String> items = [];
-
-  // List of items in our dropdown menu
-  List<String> properties = [
-    "Add Country",
-    "Add University",
-    "Add Course Level",
-    "Add Lead Source",
-    "Add Status",
-    "Add Student Type",
-    "Add Weightage"
-  ];
-
   int totalLeads = 0;
+  int index = 0;
+  int restLeads = 0;
+  int length = 10;
   final TextEditingController searchController = TextEditingController();
 
-  final List storedocs = [];
+   List storedocs = [];
   bool search = false;
-
-
+  bool isLessLead = false;
 
   @override
   void initState() {
@@ -132,16 +120,11 @@ class _ViewLeadState extends State<ViewLead> {
         .then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         if (doc["userID"] == currentUserID) {
-          setState(() {
-            currentUserName = doc["name"];
-            userName = doc["name"];
-            items = [
-              userName,
-              'Logout',
-            ];
-          });
+          currentUserName = doc["name"];
+          userName = doc["name"];
         }
       }
+      setState((){});
     });
 
     FirebaseFirestore.instance
@@ -151,9 +134,17 @@ class _ViewLeadState extends State<ViewLead> {
       for (var doc in querySnapshot.docs) {
         setState(() {
           totalLeads += 1;
+          restLeads +=1;
         });
       }
     });
+
+
+    if(totalLeads > 11){
+      setState((){
+        isLessLead = true;
+      });
+    }
 
     FirebaseFirestore.instance
         .collection('users')
@@ -173,20 +164,11 @@ class _ViewLeadState extends State<ViewLead> {
       for (var doc in querySnapshot.docs) {
         setState(() {
           _countries.add(doc["name"]);
-        });
-      }
-    });
-
-    FirebaseFirestore.instance
-        .collection('countries')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        setState(() {
           _currentCountry.add(doc["name"]);
         });
       }
     });
+
 
     FirebaseFirestore.instance
         .collection('leadsource')
@@ -224,324 +206,8 @@ class _ViewLeadState extends State<ViewLead> {
 
   @override
   Widget build(BuildContext context) {
-    Widget _modifiedToField = Container(
-      child: Row(
-        children: [
-          SizedBox(
-            width: 50,
-          ),
-          Text(
-            'Modified To   :',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          SizedBox(
-            width: 25,
-          ),
-          Material(
-            elevation: 5,
-            color: Colors.cyan,
-            borderRadius: BorderRadius.circular(10),
-            child: MaterialButton(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              minWidth: MediaQuery.of(context).size.width / 5,
-              onPressed: () {
-                showDatePicker(
-                  context: context,
-                  firstDate: DateTime(1990, 01),
-                  lastDate: DateTime(2101),
-                  initialDate: _modifiedTo ?? DateTime.now(),
-                ).then((value) {
-                  setState(() {
-                    _modifiedTo = value;
-                  });
-                });
-              },
-              child: Text(
-                (_modifiedTo == null)
-                    ? 'Pick Date'
-                    : DateFormat('yyyy-MM-dd').format(_modifiedTo!),
-                textAlign: TextAlign.center,
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-    Widget _modifiedFromField = Container(
-      child: Row(
-        children: [
-          SizedBox(
-            width: 50,
-          ),
-          Text(
-            'Modified From   :',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          SizedBox(
-            width: 25,
-          ),
-          Material(
-            elevation: 5,
-            color: Colors.cyan,
-            borderRadius: BorderRadius.circular(10),
-            child: MaterialButton(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              minWidth: MediaQuery.of(context).size.width / 5,
-              onPressed: () {
-                showDatePicker(
-                  context: context,
-                  firstDate: DateTime(1990, 01),
-                  lastDate: DateTime(2101),
-                  initialDate: _modifiedFrom ?? DateTime.now(),
-                ).then((value) {
-                  setState(() {
-                    _modifiedFrom = value;
-                  });
-                });
-              },
-              child: Text(
-                (_modifiedFrom == null)
-                    ? 'Pick Date'
-                    : DateFormat('yyyy-MM-dd').format(_modifiedFrom!),
-                textAlign: TextAlign.center,
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-    Widget _taskToField = Container(
-      child: Row(
-        children: [
-          SizedBox(
-            width: 50,
-          ),
-          Text(
-            'Task To   :',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          SizedBox(
-            width: 25,
-          ),
-          Material(
-            elevation: 5,
-            color: Colors.cyan,
-            borderRadius: BorderRadius.circular(10),
-            child: MaterialButton(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              minWidth: MediaQuery.of(context).size.width / 5,
-              onPressed: () {
-                showDatePicker(
-                  context: context,
-                  firstDate: DateTime(1990, 01),
-                  lastDate: DateTime(2101),
-                  initialDate: _taskTo ?? DateTime.now(),
-                ).then((value) {
-                  setState(() {
-                    _taskTo = value;
-                  });
-                });
-              },
-              child: Text(
-                (_taskTo == null)
-                    ? 'Pick Date'
-                    : DateFormat('yyyy-MM-dd').format(_taskTo!),
-                textAlign: TextAlign.center,
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-    Widget _taskFromField = Container(
-      child: Row(
-        children: [
-          SizedBox(
-            width: 50,
-          ),
-          Text(
-            'Task From   :',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          SizedBox(
-            width: 25,
-          ),
-          Material(
-            elevation: 5,
-            color: Colors.cyan,
-            borderRadius: BorderRadius.circular(10),
-            child: MaterialButton(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              minWidth: MediaQuery.of(context).size.width / 5,
-              onPressed: () {
-                showDatePicker(
-                  context: context,
-                  firstDate: DateTime(1990, 01),
-                  lastDate: DateTime(2101),
-                  initialDate: _taskFrom ?? DateTime.now(),
-                ).then((value) {
-                  setState(() {
-                    _taskFrom = value;
-                  });
-                });
-              },
-              child: Text(
-                (_taskFrom == null)
-                    ? 'Pick Date'
-                    : DateFormat('yyyy-MM-dd').format(_taskFrom!),
-                textAlign: TextAlign.center,
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-    Widget _dateCreatedField = Container(
-      child: Row(
-        children: [
-          SizedBox(
-            width: 50,
-          ),
-          Text(
-            'Date Created   :',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          SizedBox(
-            width: 25,
-          ),
-          Material(
-            elevation: 5,
-            color: Colors.cyan,
-            borderRadius: BorderRadius.circular(10),
-            child: MaterialButton(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              minWidth: MediaQuery.of(context).size.width / 5,
-              onPressed: () {
-                showDatePicker(
-                  context: context,
-                  firstDate: DateTime(1990, 01),
-                  lastDate: DateTime(2101),
-                  initialDate: _dateCreated ?? DateTime.now(),
-                ).then((value) {
-                  setState(() {
-                    _dateCreated = value;
-                  });
-                });
-              },
-              child: Text(
-                (_dateCreated == null)
-                    ? 'Pick Date'
-                    : DateFormat('yyyy-MM-dd').format(_dateCreated!),
-                textAlign: TextAlign.center,
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-    Widget _visaExpiredField = Container(
-      child: Row(
-        children: [
-          SizedBox(
-            width: 50,
-          ),
-          Text(
-            'Visa Expired   :',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          SizedBox(
-            width: 25,
-          ),
-          Material(
-            elevation: 5,
-            color: Colors.cyan,
-            borderRadius: BorderRadius.circular(10),
-            child: MaterialButton(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              minWidth: MediaQuery.of(context).size.width / 5,
-              onPressed: () {
-                showDatePicker(
-                  context: context,
-                  firstDate: DateTime(1990, 01),
-                  lastDate: DateTime(2101),
-                  initialDate: _visaExpired ?? DateTime.now(),
-                ).then((value) {
-                  setState(() {
-                    _visaExpired = value;
-                  });
-                });
-              },
-              child: Text(
-                (_visaExpired == null)
-                    ? 'Pick Date'
-                    : DateFormat('yyyy-MM-dd').format(_visaExpired!),
-                textAlign: TextAlign.center,
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
+
+
 
     DropdownMenuItem<String> buildMenuCurrentCountry(String item) =>
         DropdownMenuItem(
@@ -829,10 +495,10 @@ class _ViewLeadState extends State<ViewLead> {
               searchController.text = value!;
             },
             onChanged: (value) {
-              setState(() {
+              setState((){
                 search = true;
+                nameSearch(value);
               });
-              nameSearch(value);
             },
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
@@ -854,16 +520,90 @@ class _ViewLeadState extends State<ViewLead> {
               ),
             )));
 
+
+    final nextButton = ElevatedButton(
+        onPressed: (){
+            if(restLeads - 10 > 0){
+              restLeads = restLeads - 10;
+              setState((){
+                index = index + 10;
+              });
+              if(restLeads < 10){
+                setState((){
+                  length = length + restLeads;
+                });
+              }else{
+                setState((){
+                  length = length + 10;
+                });
+              }
+            }else{
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  backgroundColor: Colors.red,
+                  content: Text("No more leads!!")));
+            }
+
+        },
+        child: Text(
+          "NEXT",
+          style: TextStyle(
+            color: Colors.white
+          ),
+        ),
+    );
+    final prevButton =
+     ElevatedButton(
+        onPressed: (){
+
+          if(restLeads + 10 <= totalLeads){
+            restLeads = restLeads + 10;
+            setState((){
+              index = index - 10;
+            });
+
+            if(restLeads > 10){
+              setState((){
+                length = length - restLeads + 10;
+                index = 0;
+              });
+            }
+          }else{
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Colors.red,
+                content: Text("No more leads!!")));
+          }
+
+        },
+        child: Text(
+          "PREV",
+          style: TextStyle(
+              color: Colors.white
+          ),
+        ),
+    );
+
     final CollectionReference _collectionReference =
         FirebaseFirestore.instance.collection("leads");
 
     Widget _buildListView() {
-      return StreamBuilder<QuerySnapshot>(
-          stream: _collectionReference
-              .orderBy("timeStamp", descending: true)
-              .snapshots()
-              .asBroadcastStream(),
-          builder: (context, snapshot) {
+
+   if(search){
+     restLeads = storedocs.length;
+     index = 0;
+     if(restLeads<10){
+       length = restLeads;
+     }else{
+       length = 10;
+     }
+   }
+
+      print(restLeads);
+      print(index);
+      print(length);
+      print(search);
+      return FutureBuilder<QuerySnapshot>(
+          future: _collectionReference.orderBy("timeStamp", descending: true).get(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
               return Center(child: Text('Something went Wrong'));
             }
@@ -881,9 +621,7 @@ class _ViewLeadState extends State<ViewLead> {
                 storedocs.clear();
                 snapshot.data!.docs.map((DocumentSnapshot document) {
                   Map a = document.data() as Map<String, dynamic>;
-
                   storedocs.add(a);
-
                   a['id'] = document.id;
                 }).toList();
               }
@@ -1024,228 +762,230 @@ class _ViewLeadState extends State<ViewLead> {
                         ),
                       ),
                     ]),
-                    for (var i = 0; i < storedocs.length; i++) ...[
-                      TableRow(children: [
-                        TableCell(
-                          child: Container(
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  (storedocs[i]["timeStamp"] != null)
-                                      ? DateFormat('dd-MMM-yyyy').format(
+
+
+                        for(var i = index;i<(isLessLead?totalLeads:length); i++)...[
+                          TableRow(children: [
+                            TableCell(
+                              child: Container(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      (storedocs[i]["timeStamp"] != null)
+                                          ? DateFormat('dd-MMM-yyyy').format(
                                           storedocs[i]["timeStamp"].toDate())
-                                      : "Loading...",
-                                  style: TextStyle(
-                                    fontSize: 12.0,
+                                          : "Loading...",
+                                      style: TextStyle(
+                                        fontSize: 12.0,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: InkWell(
-                                  onTap: () {
-                                    FirebaseFirestore.instance
-                                        .collection('leads')
-                                        .get()
-                                        .then((QuerySnapshot querySnapshot) {
-                                      for (var doc in querySnapshot.docs) {
-                                        if (doc["docID"] ==
-                                            storedocs[i]["docID"]) {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      SingleLead(
-                                                        leadModel: doc,
-                                                      )));
-                                        }
-                                      }
-                                    });
-                                  },
-                                  child: Text(
-                                    storedocs[i]["firstName"] ?? "empty",
-                                    style: TextStyle(
+                            TableCell(
+                              child: Container(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: InkWell(
+                                      onTap: () {
+                                        FirebaseFirestore.instance
+                                            .collection('leads')
+                                            .get()
+                                            .then((QuerySnapshot querySnapshot) {
+                                          for (var doc in querySnapshot.docs) {
+                                            if (doc["docID"] ==
+                                                storedocs[i]["docID"]) {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          SingleLead(
+                                                            leadModel: doc,
+                                                          )));
+                                            }
+                                          }
+                                        });
+                                      },
+                                      child: Text(
+                                        storedocs[i]["firstName"] ?? "empty",
+                                        style: TextStyle(
+                                            fontSize: 15.0,
+                                            color: Colors.cyan.shade900),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Container(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      storedocs[i]["ieltsResult"] ?? "empty",
+                                      style: TextStyle(
                                         fontSize: 15.0,
-                                        color: Colors.cyan.shade900),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  storedocs[i]["ieltsResult"] ?? "empty",
-                                  style: TextStyle(
-                                    fontSize: 15.0,
+                            TableCell(
+                              child: Container(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      storedocs[i]["applyCountry"] ?? "empty",
+                                      style: TextStyle(
+                                        fontSize: 15.0,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  storedocs[i]["applyCountry"] ?? "empty",
-                                  style: TextStyle(
-                                    fontSize: 15.0,
+                            TableCell(
+                              child: Container(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      storedocs[i]["phone"] ?? "empty",
+                                      style: TextStyle(
+                                        fontSize: 15.0,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  storedocs[i]["phone"] ?? "empty",
-                                  style: TextStyle(
-                                    fontSize: 15.0,
+                            TableCell(
+                              child: Container(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: IconButton(
+                                      onPressed: () {
+                                        FirebaseFirestore.instance
+                                            .collection('leads')
+                                            .get()
+                                            .then((QuerySnapshot querySnapshot) {
+                                          for (var doc in querySnapshot.docs) {
+                                            if (doc["docID"] ==
+                                                storedocs[i]["docID"]) {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          UpdateLead(
+                                                            leadModel: doc,
+                                                          )));
+                                            }
+                                          }
+                                        });
+                                      },
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Colors.black,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: IconButton(
-                                  onPressed: () {
-                                    FirebaseFirestore.instance
-                                        .collection('leads')
-                                        .get()
-                                        .then((QuerySnapshot querySnapshot) {
-                                      for (var doc in querySnapshot.docs) {
-                                        if (doc["docID"] ==
-                                            storedocs[i]["docID"]) {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      UpdateLead(
-                                                        leadModel: doc,
-                                                      )));
-                                        }
-                                      }
-                                    });
-                                  },
-                                  icon: Icon(
-                                    Icons.edit,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: IconButton(
-                                  onPressed: () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) =>
-                                            AlertDialog(
-                                              title: Text("Confirm"),
-                                              content: Text(
-                                                  "Do you want to delete it?"),
-                                              actions: [
-                                                IconButton(
-                                                    icon: new Icon(Icons.close),
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    }),
-                                                IconButton(
-                                                    icon:
+                            TableCell(
+                              child: Container(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: IconButton(
+                                      onPressed: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) =>
+                                                AlertDialog(
+                                                  title: Text("Confirm"),
+                                                  content: Text(
+                                                      "Do you want to delete it?"),
+                                                  actions: [
+                                                    IconButton(
+                                                        icon: new Icon(Icons.close),
+                                                        onPressed: () {
+                                                          Navigator.pop(context);
+                                                        }),
+                                                    IconButton(
+                                                        icon:
                                                         new Icon(Icons.delete),
-                                                    onPressed: () {
-                                                      FirebaseFirestore.instance
-                                                          .collection('users')
-                                                          .get()
-                                                          .then((QuerySnapshot
-                                                              querySnapshot) {
-                                                        for (var doc
+                                                        onPressed: () {
+                                                          FirebaseFirestore.instance
+                                                              .collection('users')
+                                                              .get()
+                                                              .then((QuerySnapshot
+                                                          querySnapshot) {
+                                                            for (var doc
                                                             in querySnapshot
                                                                 .docs) {
-                                                          if (doc["userID"]
-                                                                      .toString() ==
+                                                              if (doc["userID"]
+                                                                  .toString() ==
                                                                   currentUserID &&
-                                                              doc["userType"]
+                                                                  doc["userType"]
                                                                       .toString()
                                                                       .toLowerCase() ==
-                                                                  "admin") {
-                                                            FirebaseFirestore
-                                                                .instance
-                                                                .collection(
+                                                                      "admin") {
+                                                                FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
                                                                     'leads')
-                                                                .get()
-                                                                .then((QuerySnapshot
-                                                                    querySnapshot) {
-                                                              for (var doc
+                                                                    .get()
+                                                                    .then((QuerySnapshot
+                                                                querySnapshot) {
+                                                                  for (var doc
                                                                   in querySnapshot
                                                                       .docs) {
-                                                                if (doc["docID"] ==
-                                                                    storedocs[i]
+                                                                    if (doc["docID"] ==
+                                                                        storedocs[i]
                                                                         [
                                                                         "docID"]) {
-                                                                  setState(() {
-                                                                    doc.reference
-                                                                        .delete();
-                                                                    setState(
-                                                                        () {
-                                                                      search =
-                                                                          false;
-                                                                      storedocs
-                                                                          .clear();
-                                                                    });
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                  });
-                                                                }
+                                                                      setState(() {
+                                                                        doc.reference
+                                                                            .delete();
+
+                                                                        search =
+                                                                        false;
+                                                                        storedocs
+                                                                            .clear();
+
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      });
+                                                                    }
+                                                                  }
+                                                                });
                                                               }
-                                                            });
-                                                          }
-                                                        }
-                                                      });
-                                                    })
-                                              ],
-                                            ));
-                                  },
-                                  icon: Icon(
-                                    Icons.delete,
-                                    color: Colors.black,
+                                                            }
+                                                          });
+                                                        })
+                                                  ],
+                                                ));
+                                      },
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: Colors.black,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                      ])
-                    ]
+                          ])
+                        ]
+
                   ],
                 )),
               );
@@ -1253,159 +993,7 @@ class _ViewLeadState extends State<ViewLead> {
           });
     }
 
-    final dropdownButtonField = DropdownButton(
-      focusColor: Colors.cyan.shade700,
-      borderRadius: BorderRadius.circular(10),
-      underline: DropdownButtonHideUnderline(child: Container()),
-      dropdownColor: Colors.white,
-      hint: Text(
-        userName,
-        style: TextStyle(color: Colors.white),
-      ),
-      icon: const Icon(
-        Icons.keyboard_arrow_down,
-        color: Colors.white,
-      ),
-      items: items.map((String items) {
-        return DropdownMenuItem(
-          value: items,
-          child: TextButton(
-            onPressed: () {
-              if (items.contains("Logout")) {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                          title: Text("Confirm"),
-                          content: Text("Do you want to log out?"),
-                          actions: [
-                            IconButton(
-                                icon: new Icon(Icons.close),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                }),
-                            IconButton(
-                                icon: new Icon(Icons.logout),
-                                onPressed: () {
-                                  FirebaseAuth.instance
-                                      .signOut()
-                                      .catchError((onError) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                            backgroundColor: Colors.red,
-                                            content: Text("Log out failed!!")));
-                                    Navigator.pop(context);
-                                  }).whenComplete(() async {
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => SignIn()),
-                                        (route) => false);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                            backgroundColor: Colors.green,
-                                            content: Text("Logged out!!")));
-                                    SharedPreferences _pref =
-                                        await SharedPreferences.getInstance();
-                                    _pref.remove("email");
-                                    _pref.remove("password");
-                                  });
-                                })
-                          ],
-                        ));
-              } else {
-                FirebaseFirestore.instance
-                    .collection('users')
-                    .get()
-                    .then((QuerySnapshot querySnapshot) {
-                  for (var doc in querySnapshot.docs) {
-                    if (doc["userID"].toString() == currentUserID) {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  UserProfile(userModel: doc)));
-                    }
-                  }
-                });
-              }
-            },
-            child: Text(
-              items,
-              style: TextStyle(color: Colors.cyan.shade700),
-            ),
-          ),
-        );
-      }).toList(),
-      // After selecting the desired option,it will
-      // change button value to selected value
-      onChanged: (String? newValue) {},
-    );
 
-    final propertyField = DropdownButton(
-      focusColor: Colors.cyan.shade700,
-      borderRadius: BorderRadius.circular(10),
-      underline: DropdownButtonHideUnderline(child: Container()),
-      dropdownColor: Colors.white,
-      hint: Text(
-        "Add Property",
-        style: TextStyle(color: Colors.white),
-      ),
-      icon: const Icon(
-        Icons.keyboard_arrow_down,
-        color: Colors.white,
-      ),
-      items: properties.map((String items) {
-        return DropdownMenuItem(
-          value: items,
-          child: TextButton(
-            onPressed: () {
-              if (items.contains("Add Country")) {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => CreateCountry()));
-              } else if (items.contains("Add University")) {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CreateUniversity()));
-              } else if (items.contains("Add Course Level")) {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CreateCourseLevel()));
-              } else if (items.contains("Add Course Title")) {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CreateCourseTitle()));
-              } else if (items.contains("Add Lead Source")) {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CreateLeadSource()));
-              } else if (items.contains("Add Status")) {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => CreateStatus()));
-              } else if (items.contains("Add Student Type")) {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CreateStudentType()));
-              } else if (items.contains("Add Weightage")) {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => CreateWeightage()));
-              }
-            },
-            child: Text(
-              items,
-              style: TextStyle(color: Colors.cyan.shade700),
-            ),
-          ),
-        );
-      }).toList(),
-      // After selecting the desired option,it will
-      // change button value to selected value
-      onChanged: (String? newValue) {},
-    );
 
     final searchButton = TextButton(
         onPressed: () {
@@ -1432,7 +1020,7 @@ class _ViewLeadState extends State<ViewLead> {
               titleTextStyle: TextStyle(fontSize: 20),
               scrollable: true,
               content:
-               StatefulBuilder(builder: (context, StateSetter setState) {
+               StatefulBuilder(builder: (context, StateSetter setState1) {
                  return SingleChildScrollView(
                    child: Container(
                      child: Padding(
@@ -1484,7 +1072,7 @@ class _ViewLeadState extends State<ViewLead> {
                                              initialDate: _modifiedFrom ??
                                                  DateTime.now(),
                                            ).then((value) {
-                                             setState(() {
+                                             setState1(() {
                                                _modifiedFrom = value;
                                              });
                                            });
@@ -1552,7 +1140,7 @@ class _ViewLeadState extends State<ViewLead> {
                                              initialDate: _modifiedTo ??
                                                  DateTime.now(),
                                            ).then((value) {
-                                             setState(() {
+                                             setState1(() {
                                                _modifiedTo = value;
                                              });
                                            });
@@ -1620,7 +1208,7 @@ class _ViewLeadState extends State<ViewLead> {
                                              initialDate: _dateCreated ??
                                                  DateTime.now(),
                                            ).then((value) {
-                                             setState(() {
+                                             setState1(() {
                                                _dateCreated = value;
                                              });
                                            });
@@ -1688,7 +1276,7 @@ class _ViewLeadState extends State<ViewLead> {
                                              initialDate: _taskFrom ??
                                                  DateTime.now(),
                                            ).then((value) {
-                                             setState(() {
+                                             setState1(() {
                                                _taskFrom = value;
                                              });
                                            });
@@ -1756,7 +1344,7 @@ class _ViewLeadState extends State<ViewLead> {
                                              initialDate: _taskTo ??
                                                  DateTime.now(),
                                            ).then((value) {
-                                             setState(() {
+                                             setState1(() {
                                                _taskTo = value;
                                              });
                                            });
@@ -1824,7 +1412,7 @@ class _ViewLeadState extends State<ViewLead> {
                                              initialDate: _visaExpired ??
                                                  DateTime.now(),
                                            ).then((value) {
-                                             setState(() {
+                                             setState1(() {
                                                _visaExpired = value;
                                              });
                                            });
@@ -1884,7 +1472,6 @@ class _ViewLeadState extends State<ViewLead> {
     final cancelFilterButton = TextButton(
         onPressed: () {
           setState(() {
-            setState(() {
               search = false;
               _chosenCountry = null;
               _chosenCurrentCountry = null;
@@ -1899,8 +1486,15 @@ class _ViewLeadState extends State<ViewLead> {
               _modifiedFrom = null;
               _modifiedTo = null;
               _visaExpired = null;
-            });
             storedocs.clear();
+              restLeads = totalLeads;
+              index = 0;
+              if(restLeads<10){
+                length = restLeads;
+              }else{
+                length = 10;
+              }
+
           });
         },
         child: Container(
@@ -1912,6 +1506,9 @@ class _ViewLeadState extends State<ViewLead> {
             style: TextStyle(color: Colors.white),
           ),
         ));
+
+
+
 
     final widthDrawer = MediaQuery.of(context).size.width / 6;
     final widthMain = widthDrawer * 5;
@@ -1983,6 +1580,22 @@ class _ViewLeadState extends State<ViewLead> {
                     SizedBox(
                       height: 10,
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: prevButton,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: nextButton,
+                          )
+                        ],
+                      ),
+                    ),
                     _buildListView()
                   ],
                 )),
@@ -2007,13 +1620,20 @@ class _ViewLeadState extends State<ViewLead> {
             .toLowerCase()
             .contains(value.toLowerCase())) {
           storedocs.add(doc);
-          setState(() {});
         }
       }
+      setState(() {});
     } else {
       setState(() {
         storedocs.clear();
         search = false;
+        restLeads = totalLeads;
+        index = 0;
+        if(restLeads<10){
+          length = restLeads;
+        }else{
+          length = 10;
+        }
       });
     }
   }
@@ -2630,24 +2250,17 @@ class _ViewLeadState extends State<ViewLead> {
     }else {
       setState(() {
         search = false;
+        restLeads = totalLeads;
+        index = 0;
+        if(restLeads<10){
+          length = restLeads;
+        }else{
+          length = 10;
+        }
       });
       storedocs.clear();
     }
 
     Navigator.of(context).pop();
-
-    // if (searchController.text != "") {
-    //   storedocs.clear();
-    //   for (var doc in documents.docs) {
-    //     if (doc["firstName"].toString().toLowerCase().contains(value.toLowerCase())) {
-    //       storedocs.add(doc);
-    //       setState(() {});
-    //     }
-    //   }
-    // } else {
-    //   setState(() {
-    //     storedocs.clear();
-    //     search = false;
-    //   });
   }
 }
