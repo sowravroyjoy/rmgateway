@@ -597,10 +597,6 @@ class _ViewLeadState extends State<ViewLead> {
      }
    }
 
-      print(restLeads);
-      print(index);
-      print(length);
-      print(search);
       return FutureBuilder<QuerySnapshot>(
           future: _collectionReference.orderBy("timeStamp", descending: true).get(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
