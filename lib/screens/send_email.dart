@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -33,7 +34,7 @@ class _SendEmailState extends State<SendEmail> {
   final emailEditingController = new TextEditingController();
   final subjectEditingController = new TextEditingController();
 
-  HtmlEditorController controller = HtmlEditorController();
+  // HtmlEditorController controller = HtmlEditorController();
   ZefyrController _controller = ZefyrController();
   List<String> emailList = [];
   List<String> nameList = [];
@@ -46,6 +47,114 @@ class _SendEmailState extends State<SendEmail> {
   ];
   String? _chosenEmailType;
 
+  String message = '''''';
+
+  String subject1 = '''It is nice to speak to you''';
+
+  String subject2 =
+      '''UK University Representative RM Gateway tried to contact again''';
+
+  String template1 = '''Dear Concern,
+
+Thank you for registering with RM gateway and showing interest to study in the UK.
+
+It is nice to speak with you about studying in the UK. I am happy to inform you that we can start
+
+your application process by following the next stage.
+
+We will require scan copies of listed documents to formally assess your application and process
+
+for admission in the UK.
+
+May we please request you to send us the following documents?
+
+• Copy of passport
+
+• Copy of previous UK visa (if applicable)
+
+• Copies of educational certificates and transcripts
+
+• Copy of IELTS Test Report (if available)
+
+• Recent CV, personal statement, and reference letter (if available)
+
+Our experienced team member will assess your eligibility after receiving these documents. We will
+
+then get back to you with the name of the University you qualified with fees and scholarship
+
+opportunities.
+
+Meanwhile, please do not hesitate to contact us if you have any queries.
+
+We are looking forward to hearing from you soon.
+
+Thank you once again for your interest to study in the UK. Your UK admission process is now just
+
+one step away.
+ ''';
+
+  String template2 = '''Dear concern,
+
+
+
+Thank you for registering with RM gateway and showing interest to study in the UK.
+
+
+
+I am sorry to inform you that our Admissions Team tried to contact you again but was unable to reach
+
+you. However, there is nothing to worry about as you can reply to this email to go to the next stage
+
+of application processing.
+
+
+
+We will require scan copies of your documents to formally assess your
+
+application and process for admission to the UK. May we please request you to send us
+
+the following documents?
+
+Copy of your passport
+
+Copy of your previous UK visa (if applicable)
+
+Copies of your educational certificates and transcripts
+
+Copy of IELTS Test Report (if available)
+
+Recent CV, personal statement, and reference letter (if available)
+Our experienced team member will assess your eligibility after receiving these documents. We will
+
+then get back to you with the name of the University you qualified with fees and scholarship
+
+opportunities. We will also provide you with further information about the course structure and other
+
+University facilities.
+
+
+
+Meanwhile, please do not hesitate to contact us if you have any queries. We are working Saturday to
+
+Thursday 10 am to 6 pm (BD time).
+
+Please do not forget there is a high chance of scholarship and securing your place at University if you
+
+start processing earlier.
+
+
+
+We are looking forward to hearing from you soon.
+
+
+
+Thank you once again for your interest to study in the UK. Your UK admission process is now just one
+
+step away. 
+
+
+ ''';
+
   @override
   void initState() {
     // TODO: implement initState
@@ -56,6 +165,8 @@ class _SendEmailState extends State<SendEmail> {
     if (widget.singleEmail != null) {
       emailList.add(widget.singleEmail.toString());
     }
+
+
   }
 
   @override
@@ -94,81 +205,92 @@ class _SendEmailState extends State<SendEmail> {
             onChanged: (newValue) {
               setState(() {
                 _chosenEmailType = newValue;
+                if (newValue == "It`s nice to speak to you") {
+                  setState(() {
+                    emailEditingController.text = template1;
+                    subjectEditingController.text = subject1;
+                  });
+                } else if (newValue == "RM Gateway tried to contact again") {
+                  setState(() {
+                    emailEditingController.text = template2;
+                    subjectEditingController.text = subject2;
+                  });
+                }
               });
             }));
 
-    // final emailField = Container(
-    //     width: MediaQuery.of(context).size.width / 3,
-    //     child: TextFormField(
-    //         cursorColor: Colors.blue,
-    //         autofocus: false,
-    //         controller: emailEditingController,
-    //         keyboardType: TextInputType.name,
-    //         maxLines: 10,
-    //         validator: (value) {
-    //           if (value!.isEmpty) {
-    //             return ("email cannot be empty!!");
-    //           }
-    //           return null;
-    //         },
-    //         onSaved: (value) {
-    //           emailEditingController.text = value!;
-    //         },
-    //         textInputAction: TextInputAction.next,
-    //         decoration: InputDecoration(
-    //           contentPadding: EdgeInsets.fromLTRB(
-    //             20,
-    //             15,
-    //             20,
-    //             15,
-    //           ),
-    //           labelText: 'Write your message',
-    //           labelStyle: TextStyle(color: Colors.black),
-    //           floatingLabelStyle: TextStyle(color: Colors.blue),
-    //           border: OutlineInputBorder(
-    //             borderRadius: BorderRadius.circular(10),
-    //           ),
-    //           focusedBorder: OutlineInputBorder(
-    //             borderRadius: BorderRadius.circular(10),
-    //             borderSide: BorderSide(color: Colors.blue),
-    //           ),
-    //         )));
+    final emailField = Container(
+        width: MediaQuery.of(context).size.width / 3,
+        child: TextFormField(
+            cursorColor: Colors.blue,
+            autofocus: false,
+            controller: emailEditingController,
+            keyboardType: TextInputType.name,
+            maxLines: 10,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return ("email cannot be empty!!");
+              }
+              return null;
+            },
+            onSaved: (value) {
+              emailEditingController.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.fromLTRB(
+                20,
+                15,
+                20,
+                15,
+              ),
+              labelText: 'Write your message',
+              labelStyle: TextStyle(color: Colors.black),
+              floatingLabelStyle: TextStyle(color: Colors.blue),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+            )));
 
-    // final subjectField = Container(
-    //     width: MediaQuery.of(context).size.width / 3,
-    //     child: TextFormField(
-    //         cursorColor: Colors.blue,
-    //         autofocus: false,
-    //         controller: subjectEditingController,
-    //         keyboardType: TextInputType.name,
-    //         validator: (value) {
-    //           if (value!.isEmpty) {
-    //             return ("subject cannot be empty!!");
-    //           }
-    //           return null;
-    //         },
-    //         onSaved: (value) {
-    //           subjectEditingController.text = value!;
-    //         },
-    //         textInputAction: TextInputAction.next,
-    //         decoration: InputDecoration(
-    //           contentPadding: EdgeInsets.fromLTRB(
-    //             20,
-    //             15,
-    //             20,
-    //             15,
-    //           ),
-    //           labelText: 'Write your subject',
-    //           labelStyle: TextStyle(color: Colors.black),
-    //           floatingLabelStyle: TextStyle(color: Colors.blue),
-    //           border: OutlineInputBorder(
-    //             borderRadius: BorderRadius.circular(10),
-    //           ),
-    //           focusedBorder: OutlineInputBorder(
-    //             borderRadius: BorderRadius.circular(10),
-    //             borderSide: BorderSide(color: Colors.blue),
-    //           ),
-    //         )));
+    final subjectField = Container(
+        width: MediaQuery.of(context).size.width / 3,
+        child: TextFormField(
+            cursorColor: Colors.blue,
+            autofocus: false,
+            controller: subjectEditingController,
+            keyboardType: TextInputType.name,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return ("subject cannot be empty!!");
+              }
+              return null;
+            },
+            onSaved: (value) {
+              subjectEditingController.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.fromLTRB(
+                20,
+                15,
+                20,
+                15,
+              ),
+              labelText: 'Write your subject',
+              labelStyle: TextStyle(color: Colors.black),
+              floatingLabelStyle: TextStyle(color: Colors.blue),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+            )));
 
     final createButton = Material(
       elevation: (_process!) ? 0 : 5,
@@ -253,29 +375,52 @@ class _SendEmailState extends State<SendEmail> {
     //   ),
     // );
 
-    // final zText = Container(
-    //     width: MediaQuery.of(context).size.width/3,
-    //   child: Column(
-    //     children: [
-    //       ZefyrToolbar.basic(
-    //           controller: _controller,
-    //       ),
-    //        Container(
-    //          padding: EdgeInsets.all(10),
-    //          decoration: BoxDecoration(
-    //            color: Colors.white,
-    //            borderRadius: BorderRadius.circular(10)
-    //          ),
-    //          child: ZefyrEditor(
-    //             maxHeight: 500,
-    //             minHeight: 100,
-    //             controller: _controller,
-    //           ),
-    //        ),
-    //
-    //     ],
-    //   )
-    // );
+    final zText = Container(
+        width: MediaQuery.of(context).size.width / 3,
+        child: Column(
+          children: [
+            ZefyrToolbar.basic(
+              controller: _controller,
+            ),
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(10)),
+              child: ZefyrEditor(
+                maxHeight: 500,
+                minHeight: 100,
+                controller: _controller,
+              ),
+            ),
+          ],
+        ));
+
+    final previewButton = TextButton(
+        onPressed: () {
+
+            message = _controller.document.toPlainText();
+
+          showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                    backgroundColor: Colors.cyan.shade100,
+                    title: Center(child: Text("Send Email")),
+                    titleTextStyle: TextStyle(fontSize: 20),
+                    scrollable: true,
+                    content: SingleChildScrollView(
+                      child: Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(50.0),
+                          child: Text(
+                              (_chosenEmailType == "It`s nice to speak to you")?  template1 + "\n" + message:
+                               template2 + "\n" +message,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ));
+        },
+        child: Text("Preview"));
 
     final CollectionReference _collectionReference =
         FirebaseFirestore.instance.collection("leads");
@@ -471,7 +616,15 @@ class _SendEmailState extends State<SendEmail> {
                   children: <Widget>[
                     emailDropdown,
                     SizedBox(
+                      height: 10,
+                    ),
+                    zText,
+                    SizedBox(
                       height: 30,
+                    ),
+                    previewButton,
+                    SizedBox(
+                      height: 10,
                     ),
                     createButton,
                     SizedBox(
@@ -507,6 +660,7 @@ class _SendEmailState extends State<SendEmail> {
                 "user_id": "43hhc_4vd52NrjxFU",
                 "template_params": {
                   "name": nameList[i],
+                  "message": _controller.document.toPlainText(),
                   "user_email": emailList[i]
                 }
               }));
@@ -544,6 +698,7 @@ class _SendEmailState extends State<SendEmail> {
                 "user_id": "43hhc_4vd52NrjxFU",
                 "template_params": {
                   "name": nameList[i],
+                  "message": _controller.document.toPlainText(),
                   "user_email": emailList[i]
                 }
               }));

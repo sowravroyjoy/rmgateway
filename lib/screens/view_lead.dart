@@ -645,6 +645,23 @@ class _ViewLeadState extends State<ViewLead> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
+                                'SL NO.',
+                                style: TextStyle(
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      TableCell(
+                        child: Container(
+                          color: Colors.cyan.shade100,
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
                                 'Date',
                                 style: TextStyle(
                                   fontSize: 15.0,
@@ -768,12 +785,27 @@ class _ViewLeadState extends State<ViewLead> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
+                                        i.toString(),
+                                      style: TextStyle(
+                                        fontSize: 15.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Container(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
                                       (storedocs[i]["timeStamp"] != null)
                                           ? DateFormat('dd-MMM-yyyy').format(
                                           storedocs[i]["timeStamp"].toDate())
                                           : "Loading...",
                                       style: TextStyle(
-                                        fontSize: 12.0,
+                                        fontSize: 9.0,
                                       ),
                                     ),
                                   ),
@@ -807,6 +839,7 @@ class _ViewLeadState extends State<ViewLead> {
                                       },
                                       child: Text(
                                         storedocs[i]["firstName"] ?? "empty",
+                                        textAlign: TextAlign.center,
                                         style: TextStyle(
                                             fontSize: 15.0,
                                             color: Colors.cyan.shade900),
