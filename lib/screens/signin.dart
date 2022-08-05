@@ -371,59 +371,87 @@ class _SignInState extends State<SignIn> {
       pref.remove("email");
       pref.remove("password");
     }
-    if (_currentUser?.emailVerified == true) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.green, content: Text("Login Successful!!")));
-      FirebaseFirestore.instance
-          .collection('users')
-          .get()
-          .then((QuerySnapshot querySnapshot) {
-        for (var doc in querySnapshot.docs) {
-          if (doc["email"].toString().toLowerCase() ==
-                  emailEditingController.text.toLowerCase() &&
-              doc["userType"].toString().toLowerCase() == "admin") {
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => ViewLead()),
-                (route) => false);
-          } else if (doc["email"].toString().toLowerCase() ==
-              emailEditingController.text.toLowerCase()) {
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ViewLead()),
-                (route) => false);
-          }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.green, content: Text("Login Successful!!")));
+    FirebaseFirestore.instance
+        .collection('users')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        if (doc["email"].toString().toLowerCase() ==
+            emailEditingController.text.toLowerCase() &&
+            doc["userType"].toString().toLowerCase() == "admin") {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => ViewLead()),
+                  (route) => false);
+        } else if (doc["email"].toString().toLowerCase() ==
+            emailEditingController.text.toLowerCase()) {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ViewLead()),
+                  (route) => false);
         }
-      });
-    } else{
-      _auth.currentUser!.sendEmailVerification().whenComplete((){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.green, content: Text("Verification email sent!!")));
-        setState(() {
-          _process = false;
-          _count = 1;
-          emailEditingController.clear();
-          passwordEditingController.clear();
-        });
-      }).onError((error, stackTrace){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.red, content: Text("Verification email sent failed!!")));
-        setState(() {
-          _process = false;
-          _count = 1;
-          emailEditingController.clear();
-          passwordEditingController.clear();
-        });
-      });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.red, content: Text("Please verify your email!!")));
-      setState(() {
-        _process = false;
-        _count = 1;
-        emailEditingController.clear();
-        passwordEditingController.clear();
-      });
-    }
+      }
+    });
+
+
+
+
+    // if (_currentUser?.emailVerified == true) {
+    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //       backgroundColor: Colors.green, content: Text("Login Successful!!")));
+    //   FirebaseFirestore.instance
+    //       .collection('users')
+    //       .get()
+    //       .then((QuerySnapshot querySnapshot) {
+    //     for (var doc in querySnapshot.docs) {
+    //       if (doc["email"].toString().toLowerCase() ==
+    //               emailEditingController.text.toLowerCase() &&
+    //           doc["userType"].toString().toLowerCase() == "admin") {
+    //         Navigator.pushAndRemoveUntil(
+    //             context,
+    //             MaterialPageRoute(builder: (context) => ViewLead()),
+    //             (route) => false);
+    //       } else if (doc["email"].toString().toLowerCase() ==
+    //           emailEditingController.text.toLowerCase()) {
+    //         Navigator.pushAndRemoveUntil(
+    //             context,
+    //             MaterialPageRoute(
+    //                 builder: (context) => ViewLead()),
+    //             (route) => false);
+    //       }
+    //     }
+    //   });
+    // } else{
+    //   _auth.currentUser!.sendEmailVerification().whenComplete((){
+    //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //         backgroundColor: Colors.green, content: Text("Verification email sent!!")));
+    //     setState(() {
+    //       _process = false;
+    //       _count = 1;
+    //       emailEditingController.clear();
+    //       passwordEditingController.clear();
+    //     });
+    //   }).onError((error, stackTrace){
+    //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //         backgroundColor: Colors.red, content: Text("Verification email sent failed!!")));
+    //     setState(() {
+    //       _process = false;
+    //       _count = 1;
+    //       emailEditingController.clear();
+    //       passwordEditingController.clear();
+    //     });
+    //   });
+    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //       backgroundColor: Colors.red, content: Text("Please verify your email!!")));
+    //   setState(() {
+    //     _process = false;
+    //     _count = 1;
+    //     emailEditingController.clear();
+    //     passwordEditingController.clear();
+    //   });
+    // }
   }
 }

@@ -2,45 +2,13 @@ import 'dart:html';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:rmgateway/model/country_model.dart';
-import 'package:rmgateway/model/course_title_model.dart';
-import 'package:rmgateway/model/lead_model.dart';
-import 'package:rmgateway/model/student_type_model.dart';
-import 'package:rmgateway/model/university_model.dart';
-import 'package:rmgateway/screens/apply.dart';
-import 'package:rmgateway/screens/attendance.dart';
-import 'package:rmgateway/screens/create_country.dart';
-import 'package:rmgateway/screens/create_course_level.dart';
-import 'package:rmgateway/screens/create_course_title.dart';
-import 'package:rmgateway/screens/create_lead_source.dart';
-import 'package:rmgateway/screens/create_status.dart';
-import 'package:rmgateway/screens/create_weightage.dart';
-import 'package:rmgateway/screens/employee_details.dart';
-import 'package:rmgateway/screens/send_email.dart';
-import 'package:rmgateway/screens/send_sms.dart';
-import 'package:rmgateway/screens/signin.dart';
 import 'package:rmgateway/screens/single_lead.dart';
-import 'package:rmgateway/screens/today_task.dart';
-import 'package:rmgateway/screens/update_country.dart';
-import 'package:rmgateway/screens/update_course_title.dart';
 import 'package:rmgateway/screens/update_lead.dart';
-import 'package:rmgateway/screens/update_student_type.dart';
-import 'package:rmgateway/screens/update_university.dart';
-import 'package:rmgateway/screens/user_profile.dart';
-import 'package:rmgateway/screens/view_lead.dart';
 import 'package:rmgateway/widgets/side_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'admin_attendance.dart';
-import 'create_lead.dart';
-import 'create_student_type.dart';
-import 'create_university.dart';
 
 class ViewLead extends StatefulWidget {
   const ViewLead({Key? key}) : super(key: key);
@@ -50,32 +18,11 @@ class ViewLead extends StatefulWidget {
 }
 
 class _ViewLeadState extends State<ViewLead> {
-  final List<String> _users = [];
   String? _chosenUser;
-
-  final List<String> _countries = [];
   String? _chosenCountry;
-
-  final List<String> _currentCountry = [];
   String? _chosenCurrentCountry;
-
-  final List<String> _leadSource = [];
   String? _chosenLeadSource;
-
-  final List<String> _weightages = [];
   String? _chosenWeightage;
-
-  final List<String> _intakeYears = [
-    "2022",
-    "2023",
-    "2024",
-    "2025",
-    "2026",
-    "2027",
-    "2028",
-    "2029",
-    "2030"
-  ];
   String? _chosenIntakeYear;
 
   final List<String> _status = [];
@@ -90,8 +37,10 @@ class _ViewLeadState extends State<ViewLead> {
 
   bool? _process;
   int? _count;
-  String? currentUserID;
-  String? currentUserName;
+  String currentUserID = "";
+  String currentUserName = "";
+  SharedPreferences? _pref;
+  String userType = "";
 
   // Initial Selected Value
   String userName = 'Unknown';
@@ -102,9 +51,27 @@ class _ViewLeadState extends State<ViewLead> {
   int length = 10;
   final TextEditingController searchController = TextEditingController();
 
-   List storedocs = [];
+  List storedocs = [];
   bool search = false;
   bool isLessLead = false;
+
+
+  List userL = [];
+  List applyCountryL = [];
+  List currentCountryL = [];
+  List leadSourceL = [];
+  List statusL = [];
+  List weightageL =[];
+  List intakeYearL = ["2020","2021","2022",'2023',"2024","2025","2026","2027","2028","2029","2030"];
+
+  bool userB = false;
+  bool applyCountryB = false;
+  bool currentCountryB = false;
+  bool leadSourceB = false;
+  bool statusB = false;
+  bool weightageB =false;
+  bool intakeYearB = false;
+
 
   @override
   void initState() {
@@ -112,21 +79,7 @@ class _ViewLeadState extends State<ViewLead> {
     super.initState();
     _process = false;
     _count = 1;
-
-    currentUserID = FirebaseAuth.instance.currentUser?.uid;
-    FirebaseFirestore.instance
-        .collection('users')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        if (doc["userID"] == currentUserID) {
-          currentUserName = doc["name"];
-          userName = doc["name"];
-        }
-      }
-      setState((){});
-    });
-
+      _getUser();
     FirebaseFirestore.instance
         .collection('leads')
         .get()
@@ -152,7 +105,7 @@ class _ViewLeadState extends State<ViewLead> {
         .then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         setState(() {
-          _users.add(doc["name"]);
+          userL.add(doc["name"]);
         });
       }
     });
@@ -163,8 +116,8 @@ class _ViewLeadState extends State<ViewLead> {
         .then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         setState(() {
-          _countries.add(doc["name"]);
-          _currentCountry.add(doc["name"]);
+          applyCountryL.add(doc["name"]);
+          currentCountryL.add(doc["name"]);
         });
       }
     });
@@ -176,7 +129,7 @@ class _ViewLeadState extends State<ViewLead> {
         .then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         setState(() {
-          _leadSource.add(doc["name"]);
+          leadSourceL.add(doc["name"]);
         });
       }
     });
@@ -187,7 +140,7 @@ class _ViewLeadState extends State<ViewLead> {
         .then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         setState(() {
-          _status.add(doc["name"]);
+          statusL.add(doc["name"]);
         });
       }
     });
@@ -198,361 +151,713 @@ class _ViewLeadState extends State<ViewLead> {
         .then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         setState(() {
-          _weightages.add(doc["name"]);
+          weightageL.add(doc["name"]);
         });
       }
     });
   }
 
+  _getUser() async{
+    _pref = await SharedPreferences.getInstance();
+  }
+
   @override
   Widget build(BuildContext context) {
 
+    String? tempName = _pref?.getString('username');
+    String? tempUserID = _pref?.getString('userID');
+    String? tempUserType = _pref?.getString('userType');
+    userName = tempName.toString();
+    currentUserID = tempUserID.toString();
+    userType = tempUserType.toString();
 
-
-    DropdownMenuItem<String> buildMenuCurrentCountry(String item) =>
-        DropdownMenuItem(
-            value: item,
-            child: Text(
-              item,
-              style: TextStyle(color: Colors.black),
-            ));
-
-    final currentCountryDropdown = Container(
-        width: MediaQuery.of(context).size.width / 5,
-        child: DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.cyan),
-              ),
-            ),
-            items: _currentCountry.map(buildMenuCurrentCountry).toList(),
-            hint: Text(
-              'Current Country',
-              style: TextStyle(color: Colors.black),
-            ),
-            value: _chosenCurrentCountry,
-            onChanged: (newValue) {
-              setState(() {
-                _chosenCurrentCountry = newValue;
-              });
-            }));
-
-    DropdownMenuItem<String> buildMenuApplyCountry(String item) =>
-        DropdownMenuItem(
-            value: item,
-            child: Text(
-              item,
-              style: TextStyle(color: Colors.black),
-            ));
-
-    final applyCountryDropdown = Container(
-        width: MediaQuery.of(context).size.width / 5,
-        child: DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.cyan),
-              ),
-            ),
-            items: _countries.map(buildMenuApplyCountry).toList(),
-            hint: Text(
-              'Interested Country',
-              style: TextStyle(color: Colors.black),
-            ),
-            value: _chosenCountry,
-            onChanged: (newValue) {
-              setState(() {
-                _chosenCountry = newValue;
-              });
-            }));
-
-    DropdownMenuItem<String> buildMenuIntakeYear(String item) =>
-        DropdownMenuItem(
-            value: item,
-            child: Text(
-              item,
-              style: TextStyle(color: Colors.black),
-            ));
-
-    final intakeYearDropdown = Container(
-        width: MediaQuery.of(context).size.width / 5,
-        child: DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.cyan),
-              ),
-            ),
-            items: _intakeYears.map(buildMenuIntakeYear).toList(),
-            hint: Text(
-              ' Intake Year',
-              style: TextStyle(color: Colors.black),
-            ),
-            value: _chosenIntakeYear,
-            onChanged: (newValue) {
-              setState(() {
-                _chosenIntakeYear = newValue;
-              });
-            }));
-
-    DropdownMenuItem<String> buildMenuWeightage(String item) =>
-        DropdownMenuItem(
-            value: item,
-            child: Text(
-              item,
-              style: TextStyle(color: Colors.black),
-            ));
-
-    final weightageDropdown = Container(
-        width: MediaQuery.of(context).size.width / 5,
-        child: DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.cyan),
-              ),
-            ),
-            items: _weightages.map(buildMenuWeightage).toList(),
-            hint: Text(
-              ' Weightage',
-              style: TextStyle(color: Colors.black),
-            ),
-            value: _chosenWeightage,
-            onChanged: (newValue) {
-              setState(() {
-                _chosenWeightage = newValue;
-              });
-            }));
-
-    DropdownMenuItem<String> buildMenuLeadSource(String item) =>
-        DropdownMenuItem(
-            value: item,
-            child: Text(
-              item,
-              style: TextStyle(color: Colors.black),
-            ));
-
-    final leadSourceDropdown = Container(
-        width: MediaQuery.of(context).size.width / 5,
-        child: DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.cyan),
-              ),
-            ),
-            items: _leadSource.map(buildMenuLeadSource).toList(),
-            hint: Text(
-              ' Lead Source',
-              style: TextStyle(color: Colors.black),
-            ),
-            value: _chosenLeadSource,
-            onChanged: (newValue) {
-              setState(() {
-                _chosenLeadSource = newValue;
-              });
-            }));
-
-    DropdownMenuItem<String> buildMenuStatus(String item) => DropdownMenuItem(
-        value: item,
-        child: Text(
-          item,
-          style: TextStyle(color: Colors.black),
-        ));
-
-    final statusDropdown = Container(
-        width: MediaQuery.of(context).size.width / 5,
-        child: DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.cyan),
-              ),
-            ),
-            items: _status.map(buildMenuStatus).toList(),
-            hint: Text(
-              ' Status',
-              style: TextStyle(color: Colors.black),
-            ),
-            value: _chosenStatus,
-            onChanged: (newValue) {
-              setState(() {
-                _chosenStatus = newValue;
-              });
-            }));
-
-    DropdownMenuItem<String> buildMenuAssigned(String item) => DropdownMenuItem(
-        value: item,
-        child: Text(
-          item,
-          style: TextStyle(color: Colors.black),
-        ));
-
-    final assignedDropdown = Container(
-        width: MediaQuery.of(context).size.width / 5,
-        child: DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.cyan),
-              ),
-            ),
-            items: _users.map(buildMenuAssigned).toList(),
-            hint: Text(
-              ' Assigned Person',
-              style: TextStyle(color: Colors.black),
-            ),
-            value: _chosenUser,
-            onChanged: (newValue) {
-              setState(() {
-                _chosenUser = newValue;
-              });
-            }));
-
-    final nameSearchField = Container(
-        width: MediaQuery.of(context).size.width / 5,
-        margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
-        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+    Widget userList(StateSetter setState1) {
+      return Container(
+        height: 200,
+        width: 300,
         decoration: BoxDecoration(
-            color: Colors.pink.shade100,
-            borderRadius: BorderRadius.circular(10)),
-        child: TextFormField(
-            cursorColor: Colors.black,
-            autofocus: false,
-            controller: searchController,
-            keyboardType: TextInputType.name,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return ("name cannot be empty!!");
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Container(
+          child: ListView.builder(
+              itemCount: userL.length,
+              itemBuilder: (context, index){
+                return ListTile(
+                  leading: Checkbox(
+                    activeColor: Colors.black,
+                    onChanged: (bool? value) {
+                      setState1(() {
+                        userB = value!;
+                        if(value == true){
+                          _chosenUser = userL[index];
+                        }else{
+                          _chosenUser = null;
+                        }
+
+                      });
+                    },
+                    value:(_chosenUser == userL[index])? userB : false,
+                  ),
+                  title: Text(
+                    userL[index],
+                  ),
+                );
               }
-              return null;
-            },
-            onSaved: (value) {
-              searchController.text = value!;
-            },
-            onChanged: (value) {
-              setState((){
-                search = true;
-                nameSearch(value);
-              });
-            },
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                15,
+          ),
+        ),
+      );
+    }
+
+    Widget applyCountryList(StateSetter setState1) {
+      return Container(
+        height: 200,
+        width: 300,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Container(
+          child: ListView.builder(
+              itemCount: applyCountryL.length,
+              itemBuilder: (context, index){
+                return ListTile(
+                  leading: Checkbox(
+                    activeColor: Colors.black,
+                    onChanged: (bool? value) {
+                      setState1(() {
+                        applyCountryB = value!;
+                        if(value == true){
+                          _chosenCountry = applyCountryL[index];
+                        }else{
+                          _chosenCountry = null;
+                        }
+                      });
+                    },
+                    value:(_chosenCountry == applyCountryL[index])? applyCountryB : false,
+                  ),
+                  title: Text(
+                    applyCountryL[index],
+                  ),
+                );
+              }
+          ),
+        ),
+      );
+    }
+
+    Widget currentCountryList(StateSetter setState1) {
+      return Container(
+        height: 200,
+        width: 300,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Container(
+          child: ListView.builder(
+              itemCount: currentCountryL.length,
+              itemBuilder: (context, index){
+                return ListTile(
+                  leading: Checkbox(
+                    activeColor: Colors.black,
+                    onChanged: (bool? value) {
+                      setState1(() {
+                        currentCountryB = value!;
+                        if(value == true){
+                          _chosenCurrentCountry = currentCountryL[index];
+                        }else{
+                          _chosenCurrentCountry = null;
+                        }
+                      });
+                    },
+                    value:(_chosenCurrentCountry == currentCountryL[index])? currentCountryB : false,
+                  ),
+                  title: Text(
+                    currentCountryL[index],
+                  ),
+                );
+              }
+          ),
+        ),
+      );
+    }
+
+    Widget leadSourceList(StateSetter setState1) {
+      return Container(
+        height: 200,
+        width: 300,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Container(
+          child: ListView.builder(
+              itemCount: leadSourceL.length,
+              itemBuilder: (context, index){
+                return ListTile(
+                  leading: Checkbox(
+                    activeColor: Colors.black,
+                    onChanged: (bool? value) {
+                      setState1(() {
+                        leadSourceB = value!;
+                        if(value == true){
+                          _chosenLeadSource = leadSourceL[index];
+                        }else{
+                          _chosenLeadSource = null;
+                        }
+                      });
+                    },
+                    value:(_chosenLeadSource == leadSourceL[index])? leadSourceB : false,
+                  ),
+                  title: Text(
+                    leadSourceL[index],
+                  ),
+                );
+              }
+          ),
+        ),
+      );
+    }
+
+    Widget statusList(StateSetter setState1) {
+      return Container(
+        height: 200,
+        width: 300,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Container(
+          child: ListView.builder(
+              itemCount: statusL.length,
+              itemBuilder: (context, index){
+                return ListTile(
+                  leading: Checkbox(
+                    activeColor: Colors.black,
+                    onChanged: (bool? value) {
+                      setState1(() {
+                        statusB = value!;
+                        if(value == true){
+                          _chosenStatus = statusL[index];
+                        }else{
+                          _chosenStatus = null;
+                        }
+                      });
+                    },
+                    value:(_chosenStatus == statusL[index])? statusB : false,
+                  ),
+                  title: Text(
+                    statusL[index],
+                  ),
+                );
+              }
+          ),
+        ),
+      );
+    }
+
+    Widget weightageList(StateSetter setState1) {
+      return Container(
+        height: 200,
+        width: 300,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Container(
+          child: ListView.builder(
+              itemCount: weightageL.length,
+              itemBuilder: (context, index){
+                return ListTile(
+                  leading: Checkbox(
+                    activeColor: Colors.black,
+                    onChanged: (bool? value) {
+                      setState1(() {
+                        weightageB = value!;
+                        if(value == true){
+                          _chosenWeightage = weightageL[index];
+                        }else{
+                          _chosenWeightage = null;
+                        }
+                      });
+                    },
+                    value:(_chosenWeightage == weightageL[index])? weightageB : false,
+                  ),
+                  title: Text(
+                    weightageL[index],
+                  ),
+                );
+              }
+          ),
+        ),
+      );
+    }
+
+    Widget intakeYearList(StateSetter setState1) {
+      return Container(
+        height: 200,
+        width: 300,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Container(
+          child: ListView.builder(
+              itemCount: intakeYearL.length,
+              itemBuilder: (context, index){
+                return ListTile(
+                  leading: Checkbox(
+                    activeColor: Colors.black,
+                    onChanged: (bool? value) {
+                      setState1(() {
+                        intakeYearB = value!;
+                        if(value == true){
+                          _chosenIntakeYear = intakeYearL[index];
+                        }else{
+                          _chosenIntakeYear = null;
+                        }
+                      });
+                    },
+                    value:(_chosenIntakeYear == intakeYearL[index])? intakeYearB : false,
+                  ),
+                  title: Text(
+                    intakeYearL[index],
+                  ),
+                );
+              }
+          ),
+        ),
+      );
+    }
+
+    Widget _modifiedFromW(StateSetter setState1) {
+      return Container(
+        child: Row(
+          children: [
+            SizedBox(
+              width: 50,
+            ),
+            Text(
+              'Modified From   :',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
-              labelText: 'Search Name',
-              labelStyle: TextStyle(color: Colors.black),
-              floatingLabelStyle: TextStyle(color: Colors.black),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
+            ),
+            SizedBox(
+              width: 25,
+            ),
+            Material(
+              elevation: 2,
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(5),
+              child: MaterialButton(
+                minWidth: MediaQuery
+                    .of(context)
+                    .size
+                    .width / 10,
+                onPressed: () {
+                  showDatePicker(
+                    context: context,
+                    firstDate: DateTime(1990, 01),
+                    lastDate: DateTime(2101),
+                    initialDate: _modifiedFrom ??
+                        DateTime.now(),
+                  ).then((value) {
+                    setState1(() {
+                      _modifiedFrom = value;
+                    });
+                  });
+                },
+                child: Text(
+                  (_modifiedFrom == null)
+                      ? 'Select'
+                      : DateFormat('yyyy-MM-dd')
+                      .format(_modifiedFrom!),
+                  textAlign: TextAlign.center,
+                  style:
+                  TextStyle(color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.black),
+            )
+          ],
+        ),
+      );
+    }
+
+    Widget _modifiedToW(StateSetter setState1) {
+      return Container(
+        child: Row(
+          children: [
+            SizedBox(
+              width: 50,
+            ),
+            Text(
+              'Modified To   :',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
-            )));
+            ),
+            SizedBox(
+              width: 25,
+            ),
+            Material(
+              elevation: 2,
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(5),
+              child: MaterialButton(
+                minWidth: MediaQuery
+                    .of(context)
+                    .size
+                    .width / 10,
+                onPressed: () {
+                  showDatePicker(
+                    context: context,
+                    firstDate: DateTime(1990, 01),
+                    lastDate: DateTime(2101),
+                    initialDate: _modifiedTo ??
+                        DateTime.now(),
+                  ).then((value) {
+                    setState1(() {
+                      _modifiedTo = value;
+                    });
+                  });
+                },
+                child: Text(
+                  (_modifiedTo == null)
+                      ? 'Select'
+                      : DateFormat('yyyy-MM-dd')
+                      .format(_modifiedTo!),
+                  textAlign: TextAlign.center,
+                  style:
+                  TextStyle(color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            )
+          ],
+        ),
+      );
+    }
+
+    Widget _taskFromW(StateSetter setState1) {
+      return Container(
+        child: Row(
+          children: [
+            SizedBox(
+              width: 50,
+            ),
+            Text(
+              'Task From   :',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(
+              width: 25,
+            ),
+            Material(
+              elevation: 2,
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(5),
+              child: MaterialButton(
+                minWidth: MediaQuery
+                    .of(context)
+                    .size
+                    .width / 10,
+                onPressed: () {
+                  showDatePicker(
+                    context: context,
+                    firstDate: DateTime(1990, 01),
+                    lastDate: DateTime(2101),
+                    initialDate: _modifiedFrom ??
+                        DateTime.now(),
+                  ).then((value) {
+                    setState1(() {
+                      _taskFrom = value;
+                    });
+                  });
+                },
+                child: Text(
+                  (_taskFrom == null)
+                      ? 'Select'
+                      : DateFormat('yyyy-MM-dd')
+                      .format(_taskFrom!),
+                  textAlign: TextAlign.center,
+                  style:
+                  TextStyle(color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            )
+          ],
+        ),
+      );
+    }
+
+    Widget _taskToW(StateSetter setState1) {
+      return Container(
+        child: Row(
+          children: [
+            SizedBox(
+              width: 50,
+            ),
+            Text(
+              'Task To   :',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(
+              width: 25,
+            ),
+            Material(
+              elevation: 2,
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(5),
+              child: MaterialButton(
+                minWidth: MediaQuery
+                    .of(context)
+                    .size
+                    .width / 10,
+                onPressed: () {
+                  showDatePicker(
+                    context: context,
+                    firstDate: DateTime(1990, 01),
+                    lastDate: DateTime(2101),
+                    initialDate: _taskTo ??
+                        DateTime.now(),
+                  ).then((value) {
+                    setState1(() {
+                      _taskTo = value;
+                    });
+                  });
+                },
+                child: Text(
+                  (_taskTo == null)
+                      ? 'Select'
+                      : DateFormat('yyyy-MM-dd')
+                      .format(_taskTo!),
+                  textAlign: TextAlign.center,
+                  style:
+                  TextStyle(color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            )
+          ],
+        ),
+      );
+    }
+
+    Widget _visaExpiredW(StateSetter setState1) {
+      return Container(
+        child: Row(
+          children: [
+            SizedBox(
+              width: 50,
+            ),
+            Text(
+              'Visa Expired   :',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(
+              width: 25,
+            ),
+            Material(
+              elevation: 2,
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(5),
+              child: MaterialButton(
+                minWidth: MediaQuery
+                    .of(context)
+                    .size
+                    .width / 10,
+                onPressed: () {
+                  showDatePicker(
+                    context: context,
+                    firstDate: DateTime(1990, 01),
+                    lastDate: DateTime(2101),
+                    initialDate: _visaExpired ??
+                        DateTime.now(),
+                  ).then((value) {
+                    setState1(() {
+                      _visaExpired = value;
+                    });
+                  });
+                },
+                child: Text(
+                  (_visaExpired == null)
+                      ? 'Select'
+                      : DateFormat('yyyy-MM-dd')
+                      .format(_visaExpired!),
+                  textAlign: TextAlign.center,
+                  style:
+                  TextStyle(color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            )
+          ],
+        ),
+      );
+    }
+
+    Widget _dateCreatedW(StateSetter setState1) {
+      return Container(
+        child: Row(
+          children: [
+            SizedBox(
+              width: 50,
+            ),
+            Text(
+              'Date Created   :',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(
+              width: 25,
+            ),
+            Material(
+              elevation: 2,
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(5),
+              child: MaterialButton(
+                minWidth: MediaQuery
+                    .of(context)
+                    .size
+                    .width / 10,
+                onPressed: () {
+                  showDatePicker(
+                    context: context,
+                    firstDate: DateTime(1990, 01),
+                    lastDate: DateTime(2101),
+                    initialDate: _dateCreated ??
+                        DateTime.now(),
+                  ).then((value) {
+                    setState1(() {
+                      _dateCreated = value;
+                    });
+                  });
+                },
+                child: Text(
+                  (_dateCreated == null)
+                      ? 'Select'
+                      : DateFormat('yyyy-MM-dd')
+                      .format(_dateCreated!),
+                  textAlign: TextAlign.center,
+                  style:
+                  TextStyle(color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            )
+          ],
+        ),
+      );
+    }
+
+    Widget _titleText(String title){
+      return Text(
+        title,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
 
 
-    final nextButton = ElevatedButton(
+      final nameSearchField = Container(
+          width: MediaQuery.of(context).size.width / 5,
+          margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
+          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+          decoration: BoxDecoration(
+              color: Colors.pink.shade100,
+              borderRadius: BorderRadius.circular(10)),
+          child: TextFormField(
+              cursorColor: Colors.black,
+              autofocus: false,
+              controller: searchController,
+              keyboardType: TextInputType.name,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return ("name cannot be empty!!");
+                }
+                return null;
+              },
+              onSaved: (value) {
+                searchController.text = value!;
+              },
+              onChanged: (value) {
+                setState((){
+                  search = true;
+                  nameSearch(value);
+                });
+              },
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.fromLTRB(
+                  20,
+                  15,
+                  20,
+                  15,
+                ),
+                labelText: 'Search Name',
+                labelStyle: TextStyle(color: Colors.black),
+                floatingLabelStyle: TextStyle(color: Colors.black),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+              )));
+
+
+      final nextButton = ElevatedButton(
         onPressed: (){
-            if(restLeads - 10 > 0){
-              restLeads = restLeads - 10;
+          if(restLeads - 10 > 0){
+            restLeads = restLeads - 10;
+            setState((){
+              index = index + 10;
+            });
+            if(restLeads < 10){
               setState((){
-                index = index + 10;
+                length = length + restLeads;
               });
-              if(restLeads < 10){
-                setState((){
-                  length = length + restLeads;
-                });
-              }else{
-                setState((){
-                  length = length + 10;
-                });
-              }
             }else{
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  backgroundColor: Colors.red,
-                  content: Text("No more leads!!")));
+              setState((){
+                length = length + 10;
+              });
             }
+          }else{
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Colors.red,
+                content: Text("No more leads!!")));
+          }
 
         },
         child: Text(
           "NEXT",
           style: TextStyle(
-            color: Colors.white
+              color: Colors.white
           ),
         ),
-    );
-    final prevButton =
-     ElevatedButton(
+      );
+      final prevButton =
+      ElevatedButton(
         onPressed: (){
 
           if(restLeads + 10 <= totalLeads){
@@ -580,214 +885,75 @@ class _ViewLeadState extends State<ViewLead> {
               color: Colors.white
           ),
         ),
-    );
+      );
 
-    final CollectionReference _collectionReference =
-        FirebaseFirestore.instance.collection("leads");
+      final CollectionReference _collectionReference =
+      FirebaseFirestore.instance.collection("leads");
 
-    Widget _buildListView() {
+      Widget _buildListView() {
 
-   if(search){
-     restLeads = storedocs.length;
-     index = 0;
-     if(restLeads<10){
-       length = restLeads;
-     }else{
-       length = 10;
-     }
-   }
+        if(search){
+          restLeads = storedocs.length;
+          index = 0;
+          if(restLeads<10){
+            length = restLeads;
+          }else{
+            length = 10;
+          }
+        }
 
-      return FutureBuilder<QuerySnapshot>(
-          future: _collectionReference.orderBy("timeStamp", descending: true).get(),
-          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.hasError) {
-              return Center(child: Text('Something went Wrong'));
-            }
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            if (!snapshot.hasData) {
-              return Center(
-                child: Text('Empty'),
-              );
-            } else {
-              if (!search) {
-                storedocs.clear();
-                snapshot.data!.docs.map((DocumentSnapshot document) {
-                  Map a = document.data() as Map<String, dynamic>;
-                  storedocs.add(a);
-                  a['id'] = document.id;
-                }).toList();
+        return FutureBuilder<QuerySnapshot>(
+            future: _collectionReference.orderBy("timeStamp", descending: true).get(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasError) {
+                return Center(child: Text('Something went Wrong'));
               }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              if (!snapshot.hasData) {
+                return Center(
+                  child: Text('Empty'),
+                );
+              } else {
+                if (!search) {
+                  storedocs.clear();
+                  snapshot.data!.docs.map((DocumentSnapshot document) {
+                    Map a = document.data() as Map<String, dynamic>;
+                    storedocs.add(a);
+                    a['id'] = document.id;
+                  }).toList();
+                }
 
-              return Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-                decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10))),
-                child: SingleChildScrollView(
-                    child: Table(
-                  border: TableBorder.all(),
-                  columnWidths: const <int, TableColumnWidth>{
-                    1: FixedColumnWidth(140),
-                  },
-                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                  children: [
-                    TableRow(children: [
-                      TableCell(
-                        child: Container(
-                          color: Colors.cyan.shade100,
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'SL NO.',
-                                style: TextStyle(
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Container(
-                          color: Colors.cyan.shade100,
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Date',
-                                style: TextStyle(
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Container(
-                          color: Colors.cyan.shade100,
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Name',
-                                style: TextStyle(
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Container(
-                          color: Colors.cyan.shade100,
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'IELTS',
-                                style: TextStyle(
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Container(
-                          color: Colors.cyan.shade100,
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Interested Country',
-                                style: TextStyle(
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Container(
-                          color: Colors.cyan.shade100,
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Phone',
-                                style: TextStyle(
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Container(
-                          color: Colors.cyan.shade100,
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Edit',
-                                style: TextStyle(
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Container(
-                          color: Colors.cyan.shade100,
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Delete',
-                                style: TextStyle(
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ]),
-
-
-                        for(var i = index;i<(isLessLead?totalLeads:length); i++)...[
+                return Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+                  decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10))),
+                  child: SingleChildScrollView(
+                      child: Table(
+                        border: TableBorder.all(),
+                        columnWidths: const <int, TableColumnWidth>{
+                          1: FixedColumnWidth(140),
+                        },
+                        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                        children: [
                           TableRow(children: [
                             TableCell(
                               child: Container(
+                                color: Colors.cyan.shade100,
                                 child: Center(
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                        i.toString(),
+                                      'SL NO.',
                                       style: TextStyle(
                                         fontSize: 15.0,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
@@ -796,16 +962,15 @@ class _ViewLeadState extends State<ViewLead> {
                             ),
                             TableCell(
                               child: Container(
+                                color: Colors.cyan.shade100,
                                 child: Center(
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      (storedocs[i]["timeStamp"] != null)
-                                          ? DateFormat('dd-MMM-yyyy').format(
-                                          storedocs[i]["timeStamp"].toDate())
-                                          : "Loading...",
+                                      'Date',
                                       style: TextStyle(
-                                        fontSize: 9.0,
+                                        fontSize: 15.0,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
@@ -814,693 +979,524 @@ class _ViewLeadState extends State<ViewLead> {
                             ),
                             TableCell(
                               child: Container(
+                                color: Colors.cyan.shade100,
                                 child: Center(
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: InkWell(
-                                      onTap: () {
-                                        FirebaseFirestore.instance
-                                            .collection('leads')
-                                            .get()
-                                            .then((QuerySnapshot querySnapshot) {
-                                          for (var doc in querySnapshot.docs) {
-                                            if (doc["docID"] ==
-                                                storedocs[i]["docID"]) {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          SingleLead(
-                                                            leadModel: doc,
-                                                          )));
-                                            }
-                                          }
-                                        });
-                                      },
+                                    child: Text(
+                                      'Name',
+                                      style: TextStyle(
+                                        fontSize: 15.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Container(
+                                color: Colors.cyan.shade100,
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'IELTS',
+                                      style: TextStyle(
+                                        fontSize: 15.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Container(
+                                color: Colors.cyan.shade100,
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Interested Country',
+                                      style: TextStyle(
+                                        fontSize: 15.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Container(
+                                color: Colors.cyan.shade100,
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Phone',
+                                      style: TextStyle(
+                                        fontSize: 15.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Container(
+                                color: Colors.cyan.shade100,
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Edit',
+                                      style: TextStyle(
+                                        fontSize: 15.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Container(
+                                color: Colors.cyan.shade100,
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Delete',
+                                      style: TextStyle(
+                                        fontSize: 15.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ]),
+
+
+                          for(var i = index;i<(isLessLead?totalLeads:length); i++)...[
+                            TableRow(children: [
+                              TableCell(
+                                child: Container(
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
                                       child: Text(
-                                        storedocs[i]["firstName"] ?? "empty",
-                                        textAlign: TextAlign.center,
+                                        i.toString(),
                                         style: TextStyle(
-                                            fontSize: 15.0,
-                                            color: Colors.cyan.shade900),
+                                          fontSize: 15.0,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            TableCell(
-                              child: Container(
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      storedocs[i]["ieltsResult"] ?? "empty",
-                                      style: TextStyle(
-                                        fontSize: 15.0,
+                              TableCell(
+                                child: Container(
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        (storedocs[i]["timeStamp"] != null)
+                                            ? DateFormat('dd-MMM-yyyy').format(
+                                            storedocs[i]["timeStamp"].toDate())
+                                            : "Loading...",
+                                        style: TextStyle(
+                                          fontSize: 9.0,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            TableCell(
-                              child: Container(
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      storedocs[i]["applyCountry"] ?? "empty",
-                                      style: TextStyle(
-                                        fontSize: 15.0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            TableCell(
-                              child: Container(
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      storedocs[i]["phone"] ?? "empty",
-                                      style: TextStyle(
-                                        fontSize: 15.0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            TableCell(
-                              child: Container(
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: IconButton(
-                                      onPressed: () {
-                                        FirebaseFirestore.instance
-                                            .collection('leads')
-                                            .get()
-                                            .then((QuerySnapshot querySnapshot) {
-                                          for (var doc in querySnapshot.docs) {
-                                            if (doc["docID"] ==
-                                                storedocs[i]["docID"]) {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          UpdateLead(
-                                                            leadModel: doc,
-                                                          )));
+                              TableCell(
+                                child: Container(
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: InkWell(
+                                        onTap: () {
+                                          FirebaseFirestore.instance
+                                              .collection('leads')
+                                              .get()
+                                              .then((QuerySnapshot querySnapshot) {
+                                            for (var doc in querySnapshot.docs) {
+                                              if (doc["docID"] ==
+                                                  storedocs[i]["docID"]) {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            SingleLead(
+                                                              leadModel: doc,
+                                                            )));
+                                              }
                                             }
-                                          }
-                                        });
-                                      },
-                                      icon: Icon(
-                                        Icons.edit,
-                                        color: Colors.black,
+                                          });
+                                        },
+                                        child: Text(
+                                          storedocs[i]["firstName"] ?? "empty",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 15.0,
+                                              color: Colors.cyan.shade900),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            TableCell(
-                              child: Container(
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: IconButton(
-                                      onPressed: () {
-                                        showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) =>
-                                                AlertDialog(
-                                                  title: Text("Confirm"),
-                                                  content: Text(
-                                                      "Do you want to delete it?"),
-                                                  actions: [
-                                                    IconButton(
-                                                        icon: new Icon(Icons.close),
-                                                        onPressed: () {
-                                                          Navigator.pop(context);
-                                                        }),
-                                                    IconButton(
-                                                        icon:
-                                                        new Icon(Icons.delete),
-                                                        onPressed: () {
-                                                          FirebaseFirestore.instance
-                                                              .collection('users')
-                                                              .get()
-                                                              .then((QuerySnapshot
-                                                          querySnapshot) {
-                                                            for (var doc
-                                                            in querySnapshot
-                                                                .docs) {
-                                                              if (doc["userID"]
-                                                                  .toString() ==
-                                                                  currentUserID &&
-                                                                  doc["userType"]
-                                                                      .toString()
-                                                                      .toLowerCase() ==
-                                                                      "admin") {
-                                                                FirebaseFirestore
-                                                                    .instance
-                                                                    .collection(
-                                                                    'leads')
-                                                                    .get()
-                                                                    .then((QuerySnapshot
-                                                                querySnapshot) {
-                                                                  for (var doc
-                                                                  in querySnapshot
-                                                                      .docs) {
-                                                                    if (doc["docID"] ==
-                                                                        storedocs[i]
-                                                                        [
-                                                                        "docID"]) {
-                                                                      setState(() {
-                                                                        doc.reference
-                                                                            .delete();
+                              TableCell(
+                                child: Container(
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        storedocs[i]["ieltsResult"] ?? "empty",
+                                        style: TextStyle(
+                                          fontSize: 15.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              TableCell(
+                                child: Container(
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        storedocs[i]["applyCountry"] ?? "empty",
+                                        style: TextStyle(
+                                          fontSize: 15.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              TableCell(
+                                child: Container(
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        storedocs[i]["phone"] ?? "empty",
+                                        style: TextStyle(
+                                          fontSize: 15.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              TableCell(
+                                child: Container(
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          FirebaseFirestore.instance
+                                              .collection('leads')
+                                              .get()
+                                              .then((QuerySnapshot querySnapshot) {
+                                            for (var doc in querySnapshot.docs) {
+                                              if (doc["docID"] ==
+                                                  storedocs[i]["docID"]) {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            UpdateLead(
+                                                              leadModel: doc,
+                                                            )));
+                                              }
+                                            }
+                                          });
+                                        },
+                                        icon: Icon(
+                                          Icons.edit,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              TableCell(
+                                child: Container(
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) =>
+                                                  AlertDialog(
+                                                    title: Text("Confirm"),
+                                                    content: Text(
+                                                        "Do you want to delete it?"),
+                                                    actions: [
+                                                      IconButton(
+                                                          icon: new Icon(Icons.close),
+                                                          onPressed: () {
+                                                            Navigator.pop(context);
+                                                          }),
+                                                      IconButton(
+                                                          icon:
+                                                          new Icon(Icons.delete),
+                                                          onPressed: () {
+                                                            FirebaseFirestore.instance
+                                                                .collection('users')
+                                                                .get()
+                                                                .then((QuerySnapshot
+                                                            querySnapshot) {
+                                                              for (var doc
+                                                              in querySnapshot
+                                                                  .docs) {
+                                                                if (doc["userID"]
+                                                                    .toString() ==
+                                                                    currentUserID &&
+                                                                    doc["userType"]
+                                                                        .toString()
+                                                                        .toLowerCase() ==
+                                                                        "admin") {
+                                                                  FirebaseFirestore
+                                                                      .instance
+                                                                      .collection(
+                                                                      'leads')
+                                                                      .get()
+                                                                      .then((QuerySnapshot
+                                                                  querySnapshot) {
+                                                                    for (var doc
+                                                                    in querySnapshot
+                                                                        .docs) {
+                                                                      if (doc["docID"] ==
+                                                                          storedocs[i]
+                                                                          [
+                                                                          "docID"]) {
+                                                                        setState(() {
+                                                                          doc.reference
+                                                                              .delete();
 
-                                                                        search =
-                                                                        false;
-                                                                        storedocs
-                                                                            .clear();
+                                                                          search =
+                                                                          false;
+                                                                          storedocs
+                                                                              .clear();
 
-                                                                        Navigator.pop(
-                                                                            context);
-                                                                      });
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                        });
+                                                                      }
                                                                     }
-                                                                  }
-                                                                });
+                                                                  });
+                                                                }
                                                               }
-                                                            }
-                                                          });
-                                                        })
-                                                  ],
-                                                ));
-                                      },
-                                      icon: Icon(
-                                        Icons.delete,
-                                        color: Colors.black,
+                                                            });
+                                                          })
+                                                    ],
+                                                  ));
+                                        },
+                                        icon: Icon(
+                                          Icons.delete,
+                                          color: Colors.black,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ])
-                        ]
+                            ])
+                          ]
 
-                  ],
-                )),
-              );
-            }
-          });
-    }
-
+                        ],
+                      )),
+                );
+              }
+            });
+      }
 
 
-    final searchButton = TextButton(
-        onPressed: () {
-          advancedSearch();
-        },
-        child: Container(
-          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-          decoration: BoxDecoration(
-              color: Colors.cyan.shade700,
-              borderRadius: BorderRadius.circular(5)),
-          child: Text(
-            "Advance Search",
-            style: TextStyle(color: Colors.white),
-          ),
-        ));
 
-    final advanceButton = TextButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) => AlertDialog(
-              backgroundColor: Colors.cyan.shade100,
-              title: Center(child: Text("Advance Search")),
-              titleTextStyle: TextStyle(fontSize: 20),
-              scrollable: true,
-              content:
-               StatefulBuilder(builder: (context, StateSetter setState1) {
-                 return SingleChildScrollView(
-                   child: Container(
-                     child: Padding(
-                       padding: const EdgeInsets.all(50.0),
-                       child: Column(
-                         mainAxisAlignment: MainAxisAlignment.center,
-                         crossAxisAlignment: CrossAxisAlignment.center,
-                         children: <Widget>[
-                           Row(
-                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                             children: [
-                               assignedDropdown,
-                               Container(
-                                 child: Row(
-                                   children: [
-                                     SizedBox(
-                                       width: 50,
-                                     ),
-                                     Text(
-                                       'Modified From   :',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.bold,
-                                         color: Colors.black,
-                                       ),
-                                     ),
-                                     SizedBox(
-                                       width: 25,
-                                     ),
-                                     Material(
-                                       elevation: 5,
-                                       color: Colors.cyan,
-                                       borderRadius: BorderRadius.circular(10),
-                                       child: MaterialButton(
-                                         padding: EdgeInsets.fromLTRB(
-                                           20,
-                                           15,
-                                           20,
-                                           15,
-                                         ),
-                                         minWidth: MediaQuery
-                                             .of(context)
-                                             .size
-                                             .width / 5,
-                                         onPressed: () {
-                                           showDatePicker(
-                                             context: context,
-                                             firstDate: DateTime(1990, 01),
-                                             lastDate: DateTime(2101),
-                                             initialDate: _modifiedFrom ??
-                                                 DateTime.now(),
-                                           ).then((value) {
-                                             setState1(() {
-                                               _modifiedFrom = value;
-                                             });
-                                           });
-                                         },
-                                         child: Text(
-                                           (_modifiedFrom == null)
-                                               ? 'Pick Date'
-                                               : DateFormat('yyyy-MM-dd')
-                                               .format(_modifiedFrom!),
-                                           textAlign: TextAlign.center,
-                                           style:
-                                           TextStyle(color: Colors.white,
-                                               fontWeight: FontWeight.bold),
-                                         ),
-                                       ),
-                                     )
-                                   ],
-                                 ),
-                               ),
-                             ],
-                           ),
-                           SizedBox(
-                             height: 20,
-                           ),
-                           Row(
-                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                             children: [
-                               applyCountryDropdown,
-                               Container(
-                                 child: Row(
-                                   children: [
-                                     SizedBox(
-                                       width: 50,
-                                     ),
-                                     Text(
-                                       'Modified To   :',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.bold,
-                                         color: Colors.black,
-                                       ),
-                                     ),
-                                     SizedBox(
-                                       width: 25,
-                                     ),
-                                     Material(
-                                       elevation: 5,
-                                       color: Colors.cyan,
-                                       borderRadius: BorderRadius.circular(10),
-                                       child: MaterialButton(
-                                         padding: EdgeInsets.fromLTRB(
-                                           20,
-                                           15,
-                                           20,
-                                           15,
-                                         ),
-                                         minWidth: MediaQuery
-                                             .of(context)
-                                             .size
-                                             .width / 5,
-                                         onPressed: () {
-                                           showDatePicker(
-                                             context: context,
-                                             firstDate: DateTime(1990, 01),
-                                             lastDate: DateTime(2101),
-                                             initialDate: _modifiedTo ??
-                                                 DateTime.now(),
-                                           ).then((value) {
-                                             setState1(() {
-                                               _modifiedTo = value;
-                                             });
-                                           });
-                                         },
-                                         child: Text(
-                                           (_modifiedTo == null)
-                                               ? 'Pick Date'
-                                               : DateFormat('yyyy-MM-dd')
-                                               .format(_modifiedTo!),
-                                           textAlign: TextAlign.center,
-                                           style:
-                                           TextStyle(color: Colors.white,
-                                               fontWeight: FontWeight.bold),
-                                         ),
-                                       ),
-                                     )
-                                   ],
-                                 ),
-                               ),
-                             ],
-                           ),
-                           SizedBox(
-                             height: 20,
-                           ),
-                           Row(
-                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                             children: [
-                               leadSourceDropdown,
-                               Container(
-                                 child: Row(
-                                   children: [
-                                     SizedBox(
-                                       width: 50,
-                                     ),
-                                     Text(
-                                       'Date Created   :',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.bold,
-                                         color: Colors.black,
-                                       ),
-                                     ),
-                                     SizedBox(
-                                       width: 25,
-                                     ),
-                                     Material(
-                                       elevation: 5,
-                                       color: Colors.cyan,
-                                       borderRadius: BorderRadius.circular(10),
-                                       child: MaterialButton(
-                                         padding: EdgeInsets.fromLTRB(
-                                           20,
-                                           15,
-                                           20,
-                                           15,
-                                         ),
-                                         minWidth: MediaQuery
-                                             .of(context)
-                                             .size
-                                             .width / 5,
-                                         onPressed: () {
-                                           showDatePicker(
-                                             context: context,
-                                             firstDate: DateTime(1990, 01),
-                                             lastDate: DateTime(2101),
-                                             initialDate: _dateCreated ??
-                                                 DateTime.now(),
-                                           ).then((value) {
-                                             setState1(() {
-                                               _dateCreated = value;
-                                             });
-                                           });
-                                         },
-                                         child: Text(
-                                           (_dateCreated == null)
-                                               ? 'Pick Date'
-                                               : DateFormat('yyyy-MM-dd')
-                                               .format(_dateCreated!),
-                                           textAlign: TextAlign.center,
-                                           style:
-                                           TextStyle(color: Colors.white,
-                                               fontWeight: FontWeight.bold),
-                                         ),
-                                       ),
-                                     )
-                                   ],
-                                 ),
-                               ),
-                             ],
-                           ),
-                           SizedBox(
-                             height: 20,
-                           ),
-                           Row(
-                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                             children: [
-                               currentCountryDropdown,
-                               Container(
-                                 child: Row(
-                                   children: [
-                                     SizedBox(
-                                       width: 50,
-                                     ),
-                                     Text(
-                                       'Task From   :',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.bold,
-                                         color: Colors.black,
-                                       ),
-                                     ),
-                                     SizedBox(
-                                       width: 25,
-                                     ),
-                                     Material(
-                                       elevation: 5,
-                                       color: Colors.cyan,
-                                       borderRadius: BorderRadius.circular(10),
-                                       child: MaterialButton(
-                                         padding: EdgeInsets.fromLTRB(
-                                           20,
-                                           15,
-                                           20,
-                                           15,
-                                         ),
-                                         minWidth: MediaQuery
-                                             .of(context)
-                                             .size
-                                             .width / 5,
-                                         onPressed: () {
-                                           showDatePicker(
-                                             context: context,
-                                             firstDate: DateTime(1990, 01),
-                                             lastDate: DateTime(2101),
-                                             initialDate: _taskFrom ??
-                                                 DateTime.now(),
-                                           ).then((value) {
-                                             setState1(() {
-                                               _taskFrom = value;
-                                             });
-                                           });
-                                         },
-                                         child: Text(
-                                           (_taskFrom == null)
-                                               ? 'Pick Date'
-                                               : DateFormat('yyyy-MM-dd')
-                                               .format(_taskFrom!),
-                                           textAlign: TextAlign.center,
-                                           style:
-                                           TextStyle(color: Colors.white,
-                                               fontWeight: FontWeight.bold),
-                                         ),
-                                       ),
-                                     )
-                                   ],
-                                 ),
-                               ),
-                             ],
-                           ),
-                           SizedBox(
-                             height: 20,
-                           ),
-                           Row(
-                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                             children: [
-                               weightageDropdown,
-                               Container(
-                                 child: Row(
-                                   children: [
-                                     SizedBox(
-                                       width: 50,
-                                     ),
-                                     Text(
-                                       'Task To   :',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.bold,
-                                         color: Colors.black,
-                                       ),
-                                     ),
-                                     SizedBox(
-                                       width: 25,
-                                     ),
-                                     Material(
-                                       elevation: 5,
-                                       color: Colors.cyan,
-                                       borderRadius: BorderRadius.circular(10),
-                                       child: MaterialButton(
-                                         padding: EdgeInsets.fromLTRB(
-                                           20,
-                                           15,
-                                           20,
-                                           15,
-                                         ),
-                                         minWidth: MediaQuery
-                                             .of(context)
-                                             .size
-                                             .width / 5,
-                                         onPressed: () {
-                                           showDatePicker(
-                                             context: context,
-                                             firstDate: DateTime(1990, 01),
-                                             lastDate: DateTime(2101),
-                                             initialDate: _taskTo ??
-                                                 DateTime.now(),
-                                           ).then((value) {
-                                             setState1(() {
-                                               _taskTo = value;
-                                             });
-                                           });
-                                         },
-                                         child: Text(
-                                           (_taskTo == null)
-                                               ? 'Pick Date'
-                                               : DateFormat('yyyy-MM-dd')
-                                               .format(_taskTo!),
-                                           textAlign: TextAlign.center,
-                                           style:
-                                           TextStyle(color: Colors.white,
-                                               fontWeight: FontWeight.bold),
-                                         ),
-                                       ),
-                                     )
-                                   ],
-                                 ),
-                               ),
-                             ],
-                           ),
-                           SizedBox(
-                             height: 20,
-                           ),
-                           Row(
-                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                             children: [
-                               intakeYearDropdown,
-                               Container(
-                                 child: Row(
-                                   children: [
-                                     SizedBox(
-                                       width: 50,
-                                     ),
-                                     Text(
-                                       'Visa Expired   :',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.bold,
-                                         color: Colors.black,
-                                       ),
-                                     ),
-                                     SizedBox(
-                                       width: 25,
-                                     ),
-                                     Material(
-                                       elevation: 5,
-                                       color: Colors.cyan,
-                                       borderRadius: BorderRadius.circular(10),
-                                       child: MaterialButton(
-                                         padding: EdgeInsets.fromLTRB(
-                                           20,
-                                           15,
-                                           20,
-                                           15,
-                                         ),
-                                         minWidth: MediaQuery
-                                             .of(context)
-                                             .size
-                                             .width / 5,
-                                         onPressed: () {
-                                           showDatePicker(
-                                             context: context,
-                                             firstDate: DateTime(1990, 01),
-                                             lastDate: DateTime(2101),
-                                             initialDate: _visaExpired ??
-                                                 DateTime.now(),
-                                           ).then((value) {
-                                             setState1(() {
-                                               _visaExpired = value;
-                                             });
-                                           });
-                                         },
-                                         child: Text(
-                                           (_visaExpired == null)
-                                               ? 'Pick Date'
-                                               : DateFormat('yyyy-MM-dd')
-                                               .format(_visaExpired!),
-                                           textAlign: TextAlign.center,
-                                           style:
-                                           TextStyle(color: Colors.white,
-                                               fontWeight: FontWeight.bold),
-                                         ),
-                                       ),
-                                     )
-                                   ],
-                                 ),
-                               ),
-                             ],
-                           ),
-                           SizedBox(
-                             height: 20,
-                           ),
-                           Row(
-                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                             children: [
-                               statusDropdown,
-                             ],
-                           ),
-                           SizedBox(
-                             height: 30,
-                           ),
-                           searchButton
-                         ],
-                       ),
-                     ),
-                   ),
-                 );
-               }
 
-              ),
+
+      final searchButton = TextButton(
+          onPressed: () {
+            advancedSearch();
+          },
+          child: Container(
+            padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+            decoration: BoxDecoration(
+                color: Colors.cyan.shade700,
+                borderRadius: BorderRadius.circular(5)),
+            child: Text(
+              "Advance Search",
+              style: TextStyle(color: Colors.white),
             ),
-          );
-        },
-        child: Container(
-          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-          decoration: BoxDecoration(
-              color: Colors.cyan.shade700,
-              borderRadius: BorderRadius.circular(5)),
-          child: Text(
-            "Advance Search",
-            style: TextStyle(color: Colors.white),
-          ),
-        ));
+          ));
 
-    final cancelFilterButton = TextButton(
-        onPressed: () {
-          setState(() {
+      final advanceButton = TextButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                backgroundColor: Colors.cyan.shade100,
+                title: Center(child: Text("Advance Search")),
+                titleTextStyle: TextStyle(fontSize: 20),
+                scrollable: true,
+                content:
+                StatefulBuilder(builder: (context, StateSetter setState1) {
+                  return SingleChildScrollView(
+                    child: Container(
+                      child: Padding(
+                        padding: const EdgeInsets.all(50.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _titleText("Assigned User"),
+                                _titleText("Apply Country"),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                userList(setState1),
+                                applyCountryList(setState1),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _titleText("Current Country"),
+                                _titleText("Lead Source"),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                currentCountryList(setState1),
+                                leadSourceList(setState1),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _titleText("Status"),
+                                _titleText("Weightage"),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                statusList(setState1),
+                                weightageList(setState1),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _titleText("Intake Year"),
+                              _visaExpiredW(setState1),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                               intakeYearList(setState1),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    _dateCreatedW(setState1),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    _modifiedFromW(setState1),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    _modifiedToW(setState1),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    _taskFromW(setState1),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    _taskToW(setState1),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 30,
+                            ),
+                            searchButton
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                ),
+              ),
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+            decoration: BoxDecoration(
+                color: Colors.cyan.shade700,
+                borderRadius: BorderRadius.circular(5)),
+            child: Text(
+              "Advance Search",
+              style: TextStyle(color: Colors.white),
+            ),
+          ));
+
+      final cancelFilterButton = TextButton(
+          onPressed: () {
+            setState(() {
               search = false;
               _chosenCountry = null;
               _chosenCurrentCountry = null;
@@ -1515,7 +1511,7 @@ class _ViewLeadState extends State<ViewLead> {
               _modifiedFrom = null;
               _modifiedTo = null;
               _visaExpired = null;
-            storedocs.clear();
+              storedocs.clear();
               restLeads = totalLeads;
               index = 0;
               if(restLeads<10){
@@ -1524,117 +1520,118 @@ class _ViewLeadState extends State<ViewLead> {
                 length = 10;
               }
 
-          });
-        },
-        child: Container(
-          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-          decoration: BoxDecoration(
-              color: Colors.red, borderRadius: BorderRadius.circular(5)),
-          child: Text(
-            "Advance Filter Off",
-            style: TextStyle(color: Colors.white),
-          ),
-        ));
+            });
+          },
+          child: Container(
+            padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+            decoration: BoxDecoration(
+                color: Colors.red, borderRadius: BorderRadius.circular(5)),
+            child: Text(
+              "Advance Filter Off",
+              style: TextStyle(color: Colors.white),
+            ),
+          ));
 
 
 
 
-    final widthDrawer = MediaQuery.of(context).size.width / 6;
-    final widthMain = widthDrawer * 5;
+      final widthDrawer = MediaQuery.of(context).size.width / 6;
+      final widthMain = widthDrawer * 5;
 
-    return Scaffold(
-      body: Row(
-        children: [
-          SideWidget(),
-          Expanded(
-            child: Stack(children: <Widget>[
-              Center(
-                child: Container(
-                  width: MediaQuery.of(context).size.width / 2,
-                  height: MediaQuery.of(context).size.height / 2,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage("assets/images/demo.jpeg"),
-                        fit: BoxFit.cover,
-                        opacity: 0.09),
+      return Scaffold(
+        body: Row(
+          children: [
+            SideWidget(),
+            Expanded(
+              child: Stack(children: <Widget>[
+                Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width / 2,
+                    height: MediaQuery.of(context).size.height / 2,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage("assets/images/demo.jpeg"),
+                          fit: BoxFit.cover,
+                          opacity: 0.09),
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                width: widthMain,
-                height: MediaQuery.of(context).size.height,
-                child: SingleChildScrollView(
-                    child: Column(
-                  children: [
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 20.0, vertical: 20.0),
-                                decoration: BoxDecoration(
-                                    color: Colors.pink.shade100,
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Text("Total Leads  :  $totalLeads"),
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              advanceButton
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              nameSearchField,
-                              SizedBox(
-                                height: 20,
-                              ),
-                              cancelFilterButton
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                Container(
+                  width: widthMain,
+                  height: MediaQuery.of(context).size.height,
+                  child: SingleChildScrollView(
+                      child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: prevButton,
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 20.0, vertical: 20.0),
+                                      decoration: BoxDecoration(
+                                          color: Colors.pink.shade100,
+                                          borderRadius: BorderRadius.circular(10)),
+                                      child: Text("Total Leads  :  $totalLeads"),
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    advanceButton
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    nameSearchField,
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    cancelFilterButton
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: 10,
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: nextButton,
-                          )
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: prevButton,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: nextButton,
+                                )
+                              ],
+                            ),
+                          ),
+                          _buildListView()
                         ],
-                      ),
-                    ),
-                    _buildListView()
-                  ],
-                )),
-              ),
-            ]),
-          ),
-        ],
-      ),
-    );
-  }
+                      )),
+                ),
+              ]),
+            ),
+          ],
+        ),
+      );
+    }
+
 
   void nameSearch(String value) async {
     final documents = await FirebaseFirestore.instance
@@ -1686,7 +1683,7 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             doc["applyCountry"].toString().toLowerCase() ==
@@ -1696,10 +1693,10 @@ class _ViewLeadState extends State<ViewLead> {
             doc["weightage"].toString().toLowerCase() ==
                 (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -1712,7 +1709,7 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedFrom != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             doc["applyCountry"].toString().toLowerCase() ==
@@ -1722,7 +1719,7 @@ class _ViewLeadState extends State<ViewLead> {
             doc["weightage"].toString().toLowerCase() ==
                 (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!))) {
           storedocs.add(doc);
         }
@@ -1734,7 +1731,7 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenWeightage != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             doc["applyCountry"].toString().toLowerCase() ==
@@ -1752,7 +1749,7 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenCurrentCountry != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             doc["applyCountry"].toString().toLowerCase() ==
@@ -1767,7 +1764,7 @@ class _ViewLeadState extends State<ViewLead> {
         _chosenCountry != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             doc["applyCountry"].toString().toLowerCase() ==
@@ -1778,7 +1775,7 @@ class _ViewLeadState extends State<ViewLead> {
     } else if (_chosenUser != null && _chosenStatus != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase())) {
           storedocs.add(doc);
@@ -1801,7 +1798,7 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["status"].toString().toLowerCase() ==
-                (_chosenStatus.toString().toLowerCase()) &&
+            (_chosenStatus.toString().toLowerCase()) &&
             doc["applyCountry"].toString().toLowerCase() ==
                 (_chosenCountry.toString().toLowerCase()) &&
             doc["originCountry"].toString().toLowerCase() ==
@@ -1809,10 +1806,10 @@ class _ViewLeadState extends State<ViewLead> {
             doc["weightage"].toString().toLowerCase() ==
                 (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -1824,16 +1821,16 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["applyCountry"].toString().toLowerCase() ==
-                (_chosenCountry.toString().toLowerCase()) &&
+            (_chosenCountry.toString().toLowerCase()) &&
             doc["originCountry"].toString().toLowerCase() ==
                 (_chosenCurrentCountry.toString().toLowerCase()) &&
             doc["weightage"].toString().toLowerCase() ==
                 (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -1844,14 +1841,14 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["originCountry"].toString().toLowerCase() ==
-                (_chosenCurrentCountry.toString().toLowerCase()) &&
+            (_chosenCurrentCountry.toString().toLowerCase()) &&
             doc["weightage"].toString().toLowerCase() ==
                 (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -1861,12 +1858,12 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["weightage"].toString().toLowerCase() ==
-                (_chosenWeightage.toString().toLowerCase()) &&
+            (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -1874,10 +1871,10 @@ class _ViewLeadState extends State<ViewLead> {
     } else if (_modifiedFrom != null && _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
-                int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
+            .format(doc["modifiedDate"].toDate())) >=
+            int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -1885,7 +1882,7 @@ class _ViewLeadState extends State<ViewLead> {
     } else if (_modifiedTo != null) {
       for (var doc in documents.docs) {
         if (int.parse(
-                DateFormat('yyyyMMdd').format(doc["modifiedDate"].toDate())) <=
+            DateFormat('yyyyMMdd').format(doc["modifiedDate"].toDate())) <=
             int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -1898,7 +1895,7 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             doc["applyCountry"].toString().toLowerCase() ==
@@ -1908,7 +1905,7 @@ class _ViewLeadState extends State<ViewLead> {
             doc["weightage"].toString().toLowerCase() ==
                 (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -1920,7 +1917,7 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             doc["applyCountry"].toString().toLowerCase() ==
@@ -1928,7 +1925,7 @@ class _ViewLeadState extends State<ViewLead> {
             doc["originCountry"].toString().toLowerCase() ==
                 (_chosenCurrentCountry.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -1939,13 +1936,13 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             doc["applyCountry"].toString().toLowerCase() ==
                 (_chosenCountry.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -1955,11 +1952,11 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -1967,9 +1964,9 @@ class _ViewLeadState extends State<ViewLead> {
     } else if (_chosenUser != null && _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -1982,7 +1979,7 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             doc["applyCountry"].toString().toLowerCase() ==
@@ -1990,10 +1987,10 @@ class _ViewLeadState extends State<ViewLead> {
             doc["originCountry"].toString().toLowerCase() ==
                 (_chosenCurrentCountry.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -2005,16 +2002,16 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             doc["applyCountry"].toString().toLowerCase() ==
                 (_chosenCountry.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -2025,14 +2022,14 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -2042,12 +2039,12 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -2060,7 +2057,7 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             doc["applyCountry"].toString().toLowerCase() ==
@@ -2068,10 +2065,10 @@ class _ViewLeadState extends State<ViewLead> {
             doc["weightage"].toString().toLowerCase() ==
                 (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -2083,16 +2080,16 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             doc["weightage"].toString().toLowerCase() ==
                 (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -2103,14 +2100,14 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["weightage"].toString().toLowerCase() ==
                 (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -2123,7 +2120,7 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["status"].toString().toLowerCase() ==
                 (_chosenStatus.toString().toLowerCase()) &&
             doc["originCountry"].toString().toLowerCase() ==
@@ -2131,10 +2128,10 @@ class _ViewLeadState extends State<ViewLead> {
             doc["weightage"].toString().toLowerCase() ==
                 (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -2146,16 +2143,16 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["originCountry"].toString().toLowerCase() ==
                 (_chosenCurrentCountry.toString().toLowerCase()) &&
             doc["weightage"].toString().toLowerCase() ==
                 (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }
@@ -2168,7 +2165,7 @@ class _ViewLeadState extends State<ViewLead> {
         _modifiedTo != null) {
       for (var doc in documents.docs) {
         if (doc["assigned"].toString().toLowerCase() ==
-                (_chosenUser.toString().toLowerCase()) &&
+            (_chosenUser.toString().toLowerCase()) &&
             doc["applyCountry"].toString().toLowerCase() ==
                 (_chosenCountry.toString().toLowerCase()) &&
             doc["originCountry"].toString().toLowerCase() ==
@@ -2176,10 +2173,10 @@ class _ViewLeadState extends State<ViewLead> {
             doc["weightage"].toString().toLowerCase() ==
                 (_chosenWeightage.toString().toLowerCase()) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) >=
+                .format(doc["modifiedDate"].toDate())) >=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedFrom!)) &&
             int.parse(DateFormat('yyyyMMdd')
-                    .format(doc["modifiedDate"].toDate())) <=
+                .format(doc["modifiedDate"].toDate())) <=
                 int.parse(DateFormat('yyyyMMdd').format(_modifiedTo!))) {
           storedocs.add(doc);
         }

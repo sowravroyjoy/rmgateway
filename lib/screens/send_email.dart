@@ -166,6 +166,22 @@ step away.
       emailList.add(widget.singleEmail.toString());
     }
 
+    _controller.document.changes.listen((event) {
+      message =_controller.document.toPlainText();
+      if(_chosenEmailType == "It`s nice to speak to you"){
+        setState((){
+
+            template1 + "\n" + message;
+
+        });
+      }else{
+        setState((){
+          template2 + "\n" +message;
+        });
+
+    }
+    });
+
 
   }
 
@@ -387,40 +403,36 @@ step away.
               decoration: BoxDecoration(
                   color: Colors.white, borderRadius: BorderRadius.circular(10)),
               child: ZefyrEditor(
-                maxHeight: 500,
-                minHeight: 100,
+                maxHeight: 800,
+                minHeight: 300,
                 controller: _controller,
               ),
             ),
           ],
         ));
 
-    final previewButton = TextButton(
-        onPressed: () {
 
-            message = _controller.document.toPlainText();
 
-          showDialog(
-              context: context,
-              builder: (BuildContext context) => AlertDialog(
-                    backgroundColor: Colors.cyan.shade100,
-                    title: Center(child: Text("Send Email")),
-                    titleTextStyle: TextStyle(fontSize: 20),
-                    scrollable: true,
-                    content: SingleChildScrollView(
-                      child: Container(
-                        child: Padding(
-                          padding: const EdgeInsets.all(50.0),
-                          child: Text(
-                              (_chosenEmailType == "It`s nice to speak to you")?  template1 + "\n" + message:
-                               template2 + "\n" +message,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ));
-        },
-        child: Text("Preview"));
+    final previewWidget =  Container(
+      width: MediaQuery.of(context).size.width/2,
+      padding: EdgeInsets.all(20.0) ,
+      height: 400,
+      decoration: BoxDecoration(
+        color: Colors.white
+      ),
+      child: SingleChildScrollView(
+        child: Container(
+          child: Padding(
+            padding: const EdgeInsets.all(50.0),
+            child: Text(
+              (_chosenEmailType == "It`s nice to speak to you")?  template1 + "\n" + message:
+              template2 + "\n" +message,
+            ),
+          ),
+        ),
+      )
+    );
+
 
     final CollectionReference _collectionReference =
         FirebaseFirestore.instance.collection("leads");
@@ -622,9 +634,9 @@ step away.
                     SizedBox(
                       height: 30,
                     ),
-                    previewButton,
+                    previewWidget,
                     SizedBox(
-                      height: 10,
+                      height: 30,
                     ),
                     createButton,
                     SizedBox(

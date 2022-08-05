@@ -6,7 +6,6 @@ import 'package:rmgateway/screens/application_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/admin_attendance.dart';
-import '../screens/apply.dart';
 import '../screens/attendance.dart';
 import '../screens/create_country.dart';
 import '../screens/create_course_level.dart';
@@ -34,8 +33,9 @@ class SideWidget extends StatefulWidget {
 
 class _SideWidgetState extends State<SideWidget> {
 
-  String? currentUserID;
-  String? currentUserName;
+  String currentUserID = "";
+  SharedPreferences? _pref;
+  String userType = "";
 
   // Initial Selected Value
   String userName = 'Unknown';
@@ -59,8 +59,12 @@ class _SideWidgetState extends State<SideWidget> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _getUser();
+  }
 
-    currentUserID = FirebaseAuth.instance.currentUser?.uid;
+  _getUser() async{
+     _pref = await SharedPreferences.getInstance();
+     currentUserID = FirebaseAuth.instance.currentUser!.uid;
     FirebaseFirestore.instance
         .collection('users')
         .get()
@@ -68,8 +72,11 @@ class _SideWidgetState extends State<SideWidget> {
       for (var doc in querySnapshot.docs) {
         if (doc["userID"] == currentUserID) {
           setState(() {
-            currentUserName = doc["name"];
             userName = doc["name"];
+            userType = doc["userType"].toString().toLowerCase();
+            _pref?.setString('username', userName);
+            _pref?.setString('userID', currentUserID);
+            _pref?.setString('userType', userType);
             items = [
               userName,
               'Logout',
@@ -78,30 +85,18 @@ class _SideWidgetState extends State<SideWidget> {
         }
       }
     });
+
   }
 
   @override
   Widget build(BuildContext context) {
+    String? tempName = _pref?.getString('username');
+    String? tempUserID = _pref?.getString('userID');
+    String? tempUserType = _pref?.getString('userType');
+      userName = tempName.toString();
+      currentUserID = tempUserID.toString();
+      userType = tempUserType.toString();
 
-
-    currentUserID = FirebaseAuth.instance.currentUser?.uid;
-    FirebaseFirestore.instance
-        .collection('users')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        if (doc["userID"] == currentUserID) {
-          setState(() {
-            currentUserName = doc["name"];
-            userName = doc["name"];
-            items = [
-              userName,
-              'Logout',
-            ];
-          });
-        }
-      }
-    });
 
     final dropdownButtonField = DropdownButton(
       focusColor: Colors.cyan.shade700,
@@ -158,6 +153,9 @@ class _SideWidgetState extends State<SideWidget> {
                                 await SharedPreferences.getInstance();
                                 _pref.remove("email");
                                 _pref.remove("password");
+                                _pref.remove("username");
+                                _pref.remove("userID");
+                                _pref.remove("userType");
                               });
                             })
                       ],
@@ -258,7 +256,7 @@ class _SideWidgetState extends State<SideWidget> {
     );
 
     final widthDrawer = MediaQuery.of(context).size.width / 6;
-    final widthMain = widthDrawer * 5;
+    // final widthMain = widthDrawer * 5;
 
     return  Container(
       width: widthDrawer,
@@ -309,7 +307,7 @@ class _SideWidgetState extends State<SideWidget> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => TodayTask(
-                          currentUserName: currentUserName.toString(),
+                          currentUserName: userName,
                         )));
               },
               child: Text(
@@ -337,21 +335,17 @@ class _SideWidgetState extends State<SideWidget> {
           ),
           TextButton(
               onPressed: () {
-                FirebaseFirestore.instance
-                    .collection('users')
-                    .get()
-                    .then((QuerySnapshot querySnapshot) {
-                  for (var doc in querySnapshot.docs) {
-                    if (doc["userID"].toString() == currentUserID &&
-                        doc["userType"].toString().toLowerCase() ==
+
+                    if ( _pref?.getString('userID')
+                    == currentUserID &&
+                        _pref?.getString('userType') ==
                             "admin") {
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                               builder: (context) => EmployeeDetails()));
                     }
-                  }
-                });
+
               },
               child: Text(
                 "Employee Details",

@@ -470,8 +470,8 @@ class _SignUpState extends State<SignUp> {
            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                backgroundColor: Colors.green, content: Text("User Created!!")));
 
-           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-               backgroundColor: Colors.green, content: Text("Verification email sent!!")));
+           // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+           //     backgroundColor: Colors.green, content: Text("Verification email sent!!")));
 
            Navigator.pushAndRemoveUntil(
                context, MaterialPageRoute(builder: (context) => SignIn()), (route) => false);
