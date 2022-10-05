@@ -926,7 +926,6 @@ class _ViewLeadState extends State<ViewLead> {
                     a['id'] = document.id;
                   }).toList();
                 }
-
                 return Container(
                   padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
                   decoration: BoxDecoration(
@@ -1082,7 +1081,7 @@ class _ViewLeadState extends State<ViewLead> {
                           ]),
 
 
-                          for(var i = index;i<(isLessLead?totalLeads:length); i++)...[
+                          for(var i = index;i<(storedocs.length < 11?storedocs.length:length); i++)...[
                             TableRow(children: [
                               TableCell(
                                 child: Container(
