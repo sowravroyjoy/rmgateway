@@ -10,6 +10,6 @@ User Management: Administer user roles and permissions.
 Integration: Integrate with third-party services and APIs.
 
 # Technologies Used
-Frontend and Backend: Dart, Flutter
-Database: Google Firebase
-Authentication: Firebase Authentication
+- Frontend and Backend: Dart, Flutter
+- Database: Google Firebase
+- Authentication: Firebase Authentication
